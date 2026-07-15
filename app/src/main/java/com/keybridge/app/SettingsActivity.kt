@@ -57,6 +57,19 @@ private fun isImeEnabled(context: Context): Boolean {
 }
 
 /**
+ * 检测当前输入法是否为 KeyBridge
+ * 通过 Settings.Secure.DEFAULT_INPUT_METHOD 精确判断
+ */
+private fun isKeyBridgeActive(context: Context): Boolean {
+    val currentIme = Settings.Secure.getString(
+        context.contentResolver,
+        Settings.Secure.DEFAULT_INPUT_METHOD
+    ) ?: return false
+    val serviceComponent = "${context.packageName}/com.keybridge.app.ime.KeyBridgeIME"
+    return currentIme == serviceComponent
+}
+
+/**
  * 获取当前正在使用的输入法组件名
  * 例如: "com.keybridge.app/com.keybridge.app.ime.KeyBridgeIME"
  */
@@ -65,14 +78,6 @@ private fun getCurrentIme(context: Context): String {
         context.contentResolver,
         Settings.Secure.DEFAULT_INPUT_METHOD
     ) ?: ""
-}
-
-/**
- * 检测当前输入法是否为 KeyBridge
- */
-private fun isKeyBridgeActive(context: Context): Boolean {
-    val current = getCurrentIme(context)
-    return current.startsWith("${context.packageName}/")
 }
 
 /**
@@ -228,7 +233,7 @@ private fun SettingsScreen() {
 
         // 第三步：开始测试（始终显示，任何输入法都能用）
         SetupCard(
-            icon = Icons.Default.CheckCircle,
+            icon = Icons.Default.Keyboard,
             step = "第三步",
             title = "现在开始吧",
             description = "进入按键检测页面，验证输入法是否正常工作",
