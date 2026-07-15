@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Keyboard
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -45,6 +46,54 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.keybridge.app.ui.theme.KeyBridgeTheme
 
+/**
+ * 检测输入法是否已启用
+ */
+private fun isImeEnabled(context: Context): Boolean {
+    val imeManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    return imeManager.enabledInputMethodList.any {
+        it.packageName == context.packageName
+    }
+}
+
+/**
+ * 获取当前正在使用的输入法组件名
+ * 例如: "com.keybridge.app/com.keybridge.app.ime.KeyBridgeIME"
+ */
+private fun getCurrentIme(context: Context): String {
+    return Settings.Secure.getString(
+        context.contentResolver,
+        Settings.Secure.DEFAULT_INPUT_METHOD
+    ) ?: ""
+}
+
+/**
+ * 检测当前输入法是否为 KeyBridge
+ */
+private fun isKeyBridgeActive(context: Context): Boolean {
+    val current = getCurrentIme(context)
+    return current.startsWith("${context.packageName}/")
+}
+
+/**
+ * 获取当前输入法的简短显示名称
+ */
+private fun getCurrentImeName(context: Context): String {
+    val current = getCurrentIme(context)
+    if (current.isEmpty()) return "无"
+    val parts = current.split("/")
+    if (parts.size < 2) return current
+    val packageName = parts[0]
+    // 尝试获取应用标签
+    return try {
+        val pm = context.packageManager
+        val appInfo = pm.getApplicationInfo(packageName, 0)
+        pm.getApplicationLabel(appInfo).toString()
+    } catch (e: Exception) {
+        packageName
+    }
+}
+
 class SettingsActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,15 +109,15 @@ class SettingsActivity : ComponentActivity() {
 @Composable
 private fun SettingsScreen() {
     val context = LocalContext.current
-    val imeManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
-    val isImeEnabled = remember {
-        mutableStateOf(imeManager.enabledInputMethodList.any {
-            it.packageName == context.packageName
-        })
-    }
+    val isImeEnabled = remember { mutableStateOf(isImeEnabled(context)) }
+    val currentImeName = remember { mutableStateOf(getCurrentImeName(context)) }
+    val isKeyBridgeActive = remember { mutableStateOf(isKeyBridgeActive(context)) }
+    val showSwitchReminder = remember { mutableStateOf(false) }
+    val showFirstLaunchDialog = remember { mutableStateOf(!isImeEnabled.value) }
 
-    var showFirstLaunchDialog = remember { mutableStateOf(!isImeEnabled.value) }
+    // 每次回到页面时刷新状态（不使用 LifecycleEventEffect，用 remember + 手动刷新）
+    // 因为 remember 只执行一次，所以我们需要在关键时机手动刷新
 
     // 首次安装引导弹窗
     if (showFirstLaunchDialog.value) {
@@ -79,12 +128,24 @@ private fun SettingsScreen() {
                 }
                 context.startActivity(intent)
             },
-            onStartClick = {
-                showFirstLaunchDialog.value = false
-                context.startActivity(Intent(context, TestActivity::class.java))
-            },
-            isImeEnabled = isImeEnabled.value,
             onDismiss = { showFirstLaunchDialog.value = false }
+        )
+    }
+
+    // 未切换提醒弹窗
+    if (showSwitchReminder.value) {
+        SwitchReminderDialog(
+            currentImeName = currentImeName.value,
+            onSwitchClick = {
+                showSwitchReminder.value = false
+                val imeManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imeManager.showInputMethodPicker()
+            },
+            onDismiss = { showSwitchReminder.value = false },
+            onIgnore = {
+                showSwitchReminder.value = false
+                context.startActivity(Intent(context, TestActivity::class.java))
+            }
         )
     }
 
@@ -141,39 +202,51 @@ private fun SettingsScreen() {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // 第二步：切换
+        // 第二步：切换（显示当前输入法名称）
+        val step2Description = if (isKeyBridgeActive.value) {
+            "✅ 当前输入法：${currentImeName.value}"
+        } else {
+            "当前输入法：${currentImeName.value}（非 KeyBridge）"
+        }
+        val step2Completed = isKeyBridgeActive.value
+
         SetupCard(
             icon = Icons.Default.Keyboard,
             step = "第二步",
             title = "切换输入法",
-            description = "点击按钮直接呼出切换框，选择 KeyBridge",
+            description = step2Description,
             buttonText = "切换输入法",
-            completed = false,
+            completed = step2Completed,
             enabled = isImeEnabled.value,
-            onClick = { imeManager.showInputMethodPicker() }
+            onClick = {
+                val imeManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imeManager.showInputMethodPicker()
+            }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // 第三步：开始测试（仅启用后显示）
-        AnimatedVisibility(
-            visible = isImeEnabled.value,
-            enter = fadeIn(),
-            exit = fadeOut()
-        ) {
-            SetupCard(
-                icon = Icons.Default.PlayArrow,
-                step = "第三步",
-                title = "现在开始吧",
-                description = "进入按键检测页面，验证输入法是否正常工作",
-                buttonText = "开始测试",
-                completed = false,
-                enabled = true,
-                onClick = {
+        // 第三步：开始测试（始终显示，任何输入法都能用）
+        SetupCard(
+            icon = Icons.Default.PlayArrow,
+            step = "第三步",
+            title = "现在开始吧",
+            description = "进入按键检测页面，验证输入法是否正常工作",
+            buttonText = "开始测试",
+            completed = false,
+            enabled = true,
+            onClick = {
+                // 检查是否切换到了 KeyBridge
+                if (isKeyBridgeActive(context)) {
                     context.startActivity(Intent(context, TestActivity::class.java))
+                } else {
+                    // 弹窗提醒
+                    currentImeName.value = getCurrentImeName(context)
+                    isKeyBridgeActive.value = isKeyBridgeActive(context)
+                    showSwitchReminder.value = true
                 }
-            )
-        }
+            }
+        )
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -189,7 +262,102 @@ private fun SettingsScreen() {
                 fontWeight = FontWeight.Medium
             )
         }
+
+        AnimatedVisibility(
+            visible = isImeEnabled.value && !isKeyBridgeActive.value,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Text(
+                text = "ℹ️ 已启用，但当前输入法为：${currentImeName.value}",
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontSize = 13.sp
+            )
+        }
+
+        AnimatedVisibility(
+            visible = isKeyBridgeActive.value,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Text(
+                text = "✅ KeyBridge 已启用并激活",
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Medium
+            )
+        }
     }
+}
+
+/**
+ * 未切换输入法提醒弹窗
+ */
+@Composable
+private fun SwitchReminderDialog(
+    currentImeName: String,
+    onSwitchClick: () -> Unit,
+    onDismiss: () -> Unit,
+    onIgnore: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = {
+            Icon(
+                imageVector = Icons.Default.Warning,
+                contentDescription = null,
+                modifier = Modifier.size(48.dp),
+                tint = MaterialTheme.colorScheme.error
+            )
+        },
+        title = {
+            Text(
+                text = "未切换到 KeyBridge",
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
+            )
+        },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "当前输入法为：$currentImeName",
+                    textAlign = TextAlign.Center,
+                    lineHeight = 22.sp
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "建议先切换到 KeyBridge 输入法，\n以获得最佳测试效果。\n\n你也可以直接进入测试页，\n任何输入法的按键都会被检测。",
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    lineHeight = 22.sp
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = onSwitchClick,
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Keyboard,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.padding(4.dp))
+                Text(text = "切换输入法")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onIgnore) {
+                Text(text = "直接进入测试")
+            }
+        }
+    )
 }
 
 /**
@@ -198,8 +366,6 @@ private fun SettingsScreen() {
 @Composable
 private fun FirstLaunchDialog(
     onEnableClick: () -> Unit,
-    onStartClick: () -> Unit,
-    isImeEnabled: Boolean,
     onDismiss: () -> Unit
 ) {
     AlertDialog(
@@ -224,53 +390,38 @@ private fun FirstLaunchDialog(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                if (!isImeEnabled) {
-                    Text(
-                        text = "KeyBridge 是一个完整的电脑键盘输入法，\n提供方向键、功能键和修饰键支持。",
-                        textAlign = TextAlign.Center,
-                        lineHeight = 22.sp
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = "使用前需要先启用输入法，\n请点击下方按钮前往设置。",
-                        textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        lineHeight = 22.sp
-                    )
-                } else {
-                    Text(
-                        text = "✅ 输入法已启用！\n\n点击下方按钮进入按键检测页面，\n验证键盘输入是否正常工作。",
-                        textAlign = TextAlign.Center,
-                        lineHeight = 22.sp
-                    )
-                }
+                Text(
+                    text = "KeyBridge 是一个完整的电脑键盘输入法，\n提供方向键、功能键和修饰键支持。",
+                    textAlign = TextAlign.Center,
+                    lineHeight = 22.sp
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "使用前需要先启用输入法，\n请点击下方按钮前往设置。",
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    lineHeight = 22.sp
+                )
             }
         },
         confirmButton = {
             Button(
                 onClick = {
-                    if (isImeEnabled) {
-                        onStartClick()
-                    } else {
-                        onEnableClick()
-                    }
+                    onEnableClick()
                     onDismiss()
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isImeEnabled)
-                        MaterialTheme.colorScheme.primary
-                    else
-                        MaterialTheme.colorScheme.primary
+                    containerColor = MaterialTheme.colorScheme.primary
                 )
             ) {
                 Icon(
-                    imageVector = if (isImeEnabled) Icons.Default.PlayArrow else Icons.Default.Settings,
+                    imageVector = Icons.Default.Settings,
                     contentDescription = null,
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.padding(4.dp))
-                Text(text = if (isImeEnabled) "现在开始吧" else "前往启用输入法")
+                Text(text = "前往启用输入法")
             }
         },
         dismissButton = {
@@ -330,7 +481,8 @@ private fun SetupCard(
             Text(
                 text = description,
                 fontSize = 13.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = if (completed) MaterialTheme.colorScheme.primary
+                else MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Spacer(modifier = Modifier.height(12.dp))
