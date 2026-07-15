@@ -1,103 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/keyboard_root"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:background="#F1F3F4"
-    android:padding="4dp">
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent">
 
-    <!-- 工具栏：修饰键状态 + 方向键切换 -->
+    <!-- 浮动键盘卡片（横屏时缩小并可拖拽，竖屏时全宽） -->
     <LinearLayout
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="38dp"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingStart="8dp"
-        android:paddingEnd="4dp"
-        android:background="#E8EAED">
-
-        <!-- 修饰键状态 -->
-        <TextView
-            android:id="@+id/mod_shift"
-            android:layout_width="wrap_content"
-            android:layout_height="24dp"
-            android:gravity="center"
-            android:text="Shift"
-            android:textSize="11sp"
-            android:textColor="#999999"
-            android:paddingStart="6dp"
-            android:paddingEnd="6dp"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/mod_ctrl"
-            android:layout_width="wrap_content"
-            android:layout_height="24dp"
-            android:gravity="center"
-            android:text="Ctrl"
-            android:textSize="11sp"
-            android:textColor="#999999"
-            android:paddingStart="6dp"
-            android:paddingEnd="6dp"
-            android:layout_marginStart="4dp"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/mod_alt"
-            android:layout_width="wrap_content"
-            android:layout_height="24dp"
-            android:gravity="center"
-            android:text="Alt"
-            android:textSize="11sp"
-            android:textColor="#999999"
-            android:paddingStart="6dp"
-            android:paddingEnd="6dp"
-            android:layout_marginStart="4dp"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/mod_meta"
-            android:layout_width="wrap_content"
-            android:layout_height="24dp"
-            android:gravity="center"
-            android:text="Meta"
-            android:textSize="11sp"
-            android:textColor="#999999"
-            android:paddingStart="6dp"
-            android:paddingEnd="6dp"
-            android:layout_marginStart="4dp"
-            android:visibility="gone" />
-
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-        <!-- 方向键切换按钮 -->
-        <ImageView
-            android:id="@+id/btn_nav_toggle"
-            android:layout_width="34dp"
-            android:layout_height="30dp"
-            android:padding="5dp"
-            android:src="@drawable/ic_nav_toggle"
-            android:background="@drawable/bg_nav_action"
-            android:contentDescription="切换导航页面" />
-    </LinearLayout>
-
-    <!-- 键盘内容区域（普通键盘） -->
-    <com.keybridge.app.ime.KeyboardView
-        android:id="@+id/keyboard_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <!-- 导航页面（方向键+编辑操作，默认隐藏） -->
-    <include
-        android:id="@+id/nav_page"
-        layout="@layout/keyboard_nav_page"
+        android:id="@+id/keyboard_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone" />
+        android:layout_gravity="bottom"
+        android:orientation="vertical"
+        android:background="@drawable/bg_floating_card"
+        android:clipToPadding="true"
+        android:padding="4dp">
 
-</LinearLayout>
+        <!-- 工具栏：修饰键状态 + 方向键切换 -->
+        <LinearLayout
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="8dp"
+            android:paddingEnd="4dp"
+            android:background="#E8EAED">
+
+            <!-- 修饰键状态 -->
+            <TextView
+                android:id="@+id/mod_shift"
+                android:layout_width="wrap_content"
+                android:layout_height="24dp"
+                android:gravity="center"
+                android:text="Shift"
+                android:textSize="11sp"
+                android:textColor="#999999"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/mod_ctrl"
+                android:layout_width="wrap_content"
+                android:layout_height="24dp"
+                android:gravity="center"
+                android:text="Ctrl"
+                android:textSize="11sp"
+                android:textColor="#999999"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
+                android:layout_marginStart="4dp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/mod_alt"
+                android:layout_width="wrap_content"
+                android:layout_height="24dp"
+                android:gravity="center"
+                android:text="Alt"
+                android:textSize="11sp"
+                android:textColor="#999999"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
+                android:layout_marginStart="4dp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/mod_meta"
+                android:layout_width="wrap_content"
+                android:layout_height="24dp"
+                android:gravity="center"
+                android:text="Meta"
+                android:textSize="11sp"
+                android:textColor="#999999"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
+                android:layout_marginStart="4dp"
+                android:visibility="gone" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <!-- 方向键切换按钮 -->
+            <ImageView
+                android:id="@+id/btn_nav_toggle"
+                android:layout_width="34dp"
+                android:layout_height="30dp"
+                android:padding="5dp"
+                android:src="@drawable/ic_nav_toggle"
+                android:background="@drawable/bg_nav_action"
+                android:contentDescription="切换导航页面" />
+        </LinearLayout>
+
+        <!-- 键盘内容区域（普通键盘） -->
+        <com.keybridge.app.ime.KeyboardView
+            android:id="@+id/keyboard_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <!-- 导航页面（方向键+编辑操作，默认隐藏） -->
+        <include
+            android:id="@+id/nav_page"
+            layout="@layout/keyboard_nav_page"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+</FrameLayout>
