@@ -2,7 +2,10 @@ package com.keybridge.app
 
 import android.content.Context
 import android.content.Intent
+import android.database.ContentObserver
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.ComponentActivity
@@ -10,7 +13,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -46,9 +48,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LifecycleEventEffect
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.keybridge.app.ui.theme.KeyBridgeTheme
 
 /**
@@ -105,32 +104,69 @@ private fun getCurrentImeName(context: Context): String {
 
 class SettingsActivity : ComponentActivity() {
 
+    private val handler = Handler(Looper.getMainLooper())
+    private val imeStateRunnable = Runnable { refreshImeState() }
+
+    /** 监听 Settings.Secure 变化（包括悬浮窗切换输入法） */
+    private val settingsObserver = object : ContentObserver(handler) {
+        override fun onChange(selfChange: Boolean) {
+            handler.removeCallbacks(imeStateRunnable)
+            handler.postDelayed(imeStateRunnable, 300)
+        }
+    }
+
+    // 可观察状态：Compose 读取这些值
+    val isImeEnabled = mutableStateOf(false)
+    val currentImeName = mutableStateOf("")
+    val isKeyBridgeActive = mutableStateOf(false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        refreshImeState()
         setContent {
             KeyBridgeTheme {
-                SettingsScreen()
+                SettingsScreen(
+                    isImeEnabled = isImeEnabled,
+                    currentImeName = currentImeName,
+                    isKeyBridgeActive = isKeyBridgeActive
+                )
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        contentResolver.registerContentObserver(
+            Settings.Secure.CONTENT_URI,
+            true,
+            settingsObserver
+        )
+        refreshImeState()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        contentResolver.unregisterContentObserver(settingsObserver)
+        handler.removeCallbacks(imeStateRunnable)
+    }
+
+    private fun refreshImeState() {
+        isImeEnabled.value = isImeEnabled(this)
+        currentImeName.value = getCurrentImeName(this)
+        isKeyBridgeActive.value = isKeyBridgeActive(this)
     }
 }
 
 @Composable
-private fun SettingsScreen() {
+private fun SettingsScreen(
+    isImeEnabled: androidx.compose.runtime.MutableState<Boolean>,
+    currentImeName: androidx.compose.runtime.MutableState<String>,
+    isKeyBridgeActive: androidx.compose.runtime.MutableState<Boolean>
+) {
     val context = LocalContext.current
 
-    val isImeEnabled = remember { mutableStateOf(isImeEnabled(context)) }
-    val currentImeName = remember { mutableStateOf(getCurrentImeName(context)) }
-    val isKeyBridgeActive = remember { mutableStateOf(isKeyBridgeActive(context)) }
     val showSwitchReminder = remember { mutableStateOf(false) }
     val showFirstLaunchDialog = remember { mutableStateOf(!isImeEnabled.value) }
-
-    // 每次页面恢复时刷新 IME 状态（用户从系统设置返回时自动更新）
-    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-        isImeEnabled.value = isImeEnabled(context)
-        currentImeName.value = getCurrentImeName(context)
-        isKeyBridgeActive.value = isKeyBridgeActive(context)
-    }
 
     // 首次安装引导弹窗
     if (showFirstLaunchDialog.value) {
