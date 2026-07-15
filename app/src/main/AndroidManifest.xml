@@ -36,7 +36,7 @@
         <activity
             android:name=".TestActivity"
             android:label="按键检测"
-            android:windowSoftInputMode="stateAlwaysVisible|adjustResize"
+            android:windowSoftInputMode="adjustResize"
             android:exported="false" />
 
     </application>

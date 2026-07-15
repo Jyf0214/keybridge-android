@@ -45,19 +45,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.keybridge.app.ui.theme.KeyBridgeTheme
 
-/**
- * 精确检测输入法是否已启用
- * 通过读取 Settings.Secure 中的 ENABLED_INPUT_METHODS 字段判断
- */
-private fun isImeEnabled(context: Context): Boolean {
-    val enabledImes = Settings.Secure.getString(
-        context.contentResolver,
-        Settings.Secure.ENABLED_INPUT_METHODS
-    ) ?: return false
-    val componentPrefix = "${context.packageName}/"
-    return enabledImes.split(";").any { it.startsWith(componentPrefix) }
-}
-
 class SettingsActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,7 +63,9 @@ private fun SettingsScreen() {
     val imeManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
     val isImeEnabled = remember {
-        mutableStateOf(isImeEnabled(context))
+        mutableStateOf(imeManager.enabledInputMethodList.any {
+            it.packageName == context.packageName
+        })
     }
 
     var showFirstLaunchDialog = remember { mutableStateOf(!isImeEnabled.value) }

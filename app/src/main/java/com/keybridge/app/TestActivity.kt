@@ -42,6 +42,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -211,6 +217,7 @@ private fun TestScreen(
     onBack: () -> Unit
 ) {
     val listState = rememberLazyListState()
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     Scaffold(
         topBar = {
@@ -260,12 +267,18 @@ private fun TestScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // 输入框（点击后弹出键盘，Activity 的 onKeyDown 会捕获所有按键）
+            // 输入框（保持焦点以接收按键）
             OutlinedTextField(
                 value = "",
                 onValueChange = {},
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onKeyEvent { event ->
+                        // 通过 Compose onKeyEvent 额外捕获修饰键组合
+                        false // 不消费，让 Activity 的 onKeyDown 处理
+                    },
                 label = { Text("点击此处开始输入测试") },
+                readOnly = true,
                 textStyle = MaterialTheme.typography.bodyLarge.copy(
                     fontFamily = FontFamily.Monospace
                 )
