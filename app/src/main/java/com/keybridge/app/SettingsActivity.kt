@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Keyboard
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -29,14 +30,11 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -70,22 +68,23 @@ private fun SettingsScreen() {
         })
     }
 
-    // 首次安装弹窗
-    var showFirstLaunchDialog by remember { mutableStateOf(!isImeEnabled.value) }
+    var showFirstLaunchDialog = remember { mutableStateOf(!isImeEnabled.value) }
 
     // 首次安装引导弹窗
-    if (showFirstLaunchDialog) {
+    if (showFirstLaunchDialog.value) {
         FirstLaunchDialog(
             onEnableClick = {
-                // 跳转到输入法设置页面
                 val intent = Intent(Settings.ACTION_INPUT_METHOD_SETTINGS).apply {
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 }
                 context.startActivity(intent)
             },
-            onDismiss = {
-                showFirstLaunchDialog = false
-            }
+            onStartClick = {
+                showFirstLaunchDialog.value = false
+                context.startActivity(Intent(context, TestActivity::class.java))
+            },
+            isImeEnabled = isImeEnabled.value,
+            onDismiss = { showFirstLaunchDialog.value = false }
         )
     }
 
@@ -96,7 +95,6 @@ private fun SettingsScreen() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // App 图标
         Icon(
             imageVector = Icons.Default.Keyboard,
             contentDescription = "KeyBridge",
@@ -125,7 +123,7 @@ private fun SettingsScreen() {
 
         Spacer(modifier = Modifier.height(40.dp))
 
-        // 步骤卡片
+        // 第一步：启用
         SetupCard(
             icon = Icons.Default.Settings,
             step = "第一步",
@@ -143,6 +141,7 @@ private fun SettingsScreen() {
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // 第二步：切换
         SetupCard(
             icon = Icons.Default.Keyboard,
             step = "第二步",
@@ -151,26 +150,34 @@ private fun SettingsScreen() {
             buttonText = "切换输入法",
             completed = false,
             enabled = isImeEnabled.value,
-            onClick = {
-                imeManager.showInputMethodPicker()
-            }
+            onClick = { imeManager.showInputMethodPicker() }
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        // 状态提示
+        // 第三步：开始测试（仅启用后显示）
         AnimatedVisibility(
             visible = isImeEnabled.value,
             enter = fadeIn(),
             exit = fadeOut()
         ) {
-            Text(
-                text = "✅ KeyBridge 已启用",
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Medium
+            SetupCard(
+                icon = Icons.Default.PlayArrow,
+                step = "第三步",
+                title = "现在开始吧",
+                description = "进入按键检测页面，验证输入法是否正常工作",
+                buttonText = "开始测试",
+                completed = false,
+                enabled = true,
+                onClick = {
+                    context.startActivity(Intent(context, TestActivity::class.java))
+                }
             )
         }
 
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // 状态提示
         AnimatedVisibility(
             visible = !isImeEnabled.value,
             enter = fadeIn(),
@@ -191,6 +198,8 @@ private fun SettingsScreen() {
 @Composable
 private fun FirstLaunchDialog(
     onEnableClick: () -> Unit,
+    onStartClick: () -> Unit,
+    isImeEnabled: Boolean,
     onDismiss: () -> Unit
 ) {
     AlertDialog(
@@ -215,40 +224,53 @@ private fun FirstLaunchDialog(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = "KeyBridge 是一个完整的电脑键盘输入法，\n提供方向键、功能键和修饰键支持。",
-                    textAlign = TextAlign.Center,
-                    lineHeight = 22.sp
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Text(
-                    text = "使用前需要先启用输入法，\n请点击下方按钮前往设置。",
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    lineHeight = 22.sp
-                )
+                if (!isImeEnabled) {
+                    Text(
+                        text = "KeyBridge 是一个完整的电脑键盘输入法，\n提供方向键、功能键和修饰键支持。",
+                        textAlign = TextAlign.Center,
+                        lineHeight = 22.sp
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "使用前需要先启用输入法，\n请点击下方按钮前往设置。",
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 22.sp
+                    )
+                } else {
+                    Text(
+                        text = "✅ 输入法已启用！\n\n点击下方按钮进入按键检测页面，\n验证键盘输入是否正常工作。",
+                        textAlign = TextAlign.Center,
+                        lineHeight = 22.sp
+                    )
+                }
             }
         },
         confirmButton = {
             Button(
                 onClick = {
-                    onEnableClick()
+                    if (isImeEnabled) {
+                        onStartClick()
+                    } else {
+                        onEnableClick()
+                    }
                     onDismiss()
                 },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
+                    containerColor = if (isImeEnabled)
+                        MaterialTheme.colorScheme.primary
+                    else
+                        MaterialTheme.colorScheme.primary
                 )
             ) {
                 Icon(
-                    imageVector = Icons.Default.Settings,
+                    imageVector = if (isImeEnabled) Icons.Default.PlayArrow else Icons.Default.Settings,
                     contentDescription = null,
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.padding(4.dp))
-                Text(text = "前往启用输入法")
+                Text(text = if (isImeEnabled) "现在开始吧" else "前往启用输入法")
             }
         },
         dismissButton = {
@@ -279,14 +301,11 @@ private fun SetupCard(
                 MaterialTheme.colorScheme.surfaceVariant
         )
     ) {
-        Column(
-            modifier = Modifier.padding(20.dp)
-        ) {
+        Column(modifier = Modifier.padding(20.dp)) {
             Icon(
                 imageVector = if (completed) Icons.Default.CheckCircle else icon,
                 contentDescription = null,
-                tint = if (completed) MaterialTheme.colorScheme.primary
-                else MaterialTheme.colorScheme.primary,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(28.dp)
             )
 
@@ -321,10 +340,8 @@ private fun SetupCard(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = enabled,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (completed)
-                        MaterialTheme.colorScheme.secondary
-                    else
-                        MaterialTheme.colorScheme.primary
+                    containerColor = if (completed) MaterialTheme.colorScheme.secondary
+                    else MaterialTheme.colorScheme.primary
                 )
             ) {
                 Text(text = if (completed) "已完成" else buttonText)
