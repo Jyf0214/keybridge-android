@@ -2,181 +2,198 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="8dp"
-    android:gravity="center">
+    android:orientation="horizontal"
+    android:paddingStart="6dp"
+    android:paddingEnd="6dp"
+    android:paddingTop="4dp"
+    android:paddingBottom="4dp"
+    android:gravity="center_vertical">
 
-    <!-- 方向键区域：倒 T 形 -->
+    <!-- ========== 左侧：方向键（占大头） ========== -->
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center">
+        android:layout_weight="6"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="4dp">
 
-        <TextView
-            android:id="@+id/nav_up"
-            android:layout_width="64dp"
-            android:layout_height="52dp"
+        <!-- 上 -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/nav_up"
+                android:layout_width="72dp"
+                android:layout_height="56dp"
+                android:gravity="center"
+                android:text="▲"
+                android:textSize="22sp"
+                android:textColor="#1A73E8"
+                android:background="@drawable/bg_nav_key" />
+        </LinearLayout>
+
+        <!-- ← · → -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:gravity="center"
-            android:text="▲"
-            android:textSize="20sp"
-            android:textColor="#1565C0"
-            android:background="@drawable/bg_nav_key"
-            android:layout_marginEnd="2dp" />
+            android:layout_marginTop="4dp">
+
+            <TextView
+                android:id="@+id/nav_left"
+                android:layout_width="72dp"
+                android:layout_height="56dp"
+                android:gravity="center"
+                android:text="◀"
+                android:textSize="22sp"
+                android:textColor="#1A73E8"
+                android:background="@drawable/bg_nav_key" />
+
+            <TextView
+                android:layout_width="36dp"
+                android:layout_height="56dp"
+                android:gravity="center"
+                android:text="·"
+                android:textSize="22sp"
+                android:textColor="#DADCE0" />
+
+            <TextView
+                android:id="@+id/nav_right"
+                android:layout_width="72dp"
+                android:layout_height="56dp"
+                android:gravity="center"
+                android:text="▶"
+                android:textSize="22sp"
+                android:textColor="#1A73E8"
+                android:background="@drawable/bg_nav_key" />
+        </LinearLayout>
+
+        <!-- 下 -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginTop="4dp">
+
+            <TextView
+                android:id="@+id/nav_down"
+                android:layout_width="72dp"
+                android:layout_height="56dp"
+                android:gravity="center"
+                android:text="▼"
+                android:textSize="22sp"
+                android:textColor="#1A73E8"
+                android:background="@drawable/bg_nav_key" />
+        </LinearLayout>
+
     </LinearLayout>
 
+    <!-- ========== 右侧：操作按钮（小图标） ========== -->
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center">
+        android:layout_weight="4"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:paddingStart="4dp">
 
-        <TextView
-            android:id="@+id/nav_left"
-            android:layout_width="64dp"
-            android:layout_height="52dp"
-            android:gravity="center"
-            android:text="◀"
-            android:textSize="20sp"
-            android:textColor="#1565C0"
-            android:background="@drawable/bg_nav_key"
-            android:layout_marginEnd="2dp" />
+        <!-- 第一行：撤销 / 重做 / 退格 -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
 
-        <TextView
-            android:layout_width="64dp"
-            android:layout_height="52dp"
-            android:gravity="center"
-            android:text="·"
-            android:textSize="20sp"
-            android:textColor="#999999"
-            android:layout_marginStart="2dp"
-            android:layout_marginEnd="2dp" />
+            <ImageView
+                android:id="@+id/nav_undo"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="8dp"
+                android:src="@drawable/ic_undo"
+                android:background="@drawable/bg_nav_action"
+                android:contentDescription="撤销"
+                android:layout_marginEnd="3dp" />
 
-        <TextView
-            android:id="@+id/nav_right"
-            android:layout_width="64dp"
-            android:layout_height="52dp"
-            android:gravity="center"
-            android:text="▶"
-            android:textSize="20sp"
-            android:textColor="#1565C0"
-            android:background="@drawable/bg_nav_key"
-            android:layout_marginStart="2dp" />
-    </LinearLayout>
+            <ImageView
+                android:id="@+id/nav_redo"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="8dp"
+                android:src="@drawable/ic_redo"
+                android:background="@drawable/bg_nav_action"
+                android:contentDescription="重做"
+                android:layout_marginStart="3dp"
+                android:layout_marginEnd="3dp" />
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center">
+            <ImageView
+                android:id="@+id/nav_backspace"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="8dp"
+                android:src="@drawable/ic_backspace"
+                android:background="@drawable/bg_nav_action"
+                android:contentDescription="退格"
+                android:layout_marginStart="3dp" />
+        </LinearLayout>
 
-        <TextView
-            android:id="@+id/nav_down"
-            android:layout_width="64dp"
-            android:layout_height="52dp"
-            android:gravity="center"
-            android:text="▼"
-            android:textSize="20sp"
-            android:textColor="#1565C0"
-            android:background="@drawable/bg_nav_key"
-            android:layout_marginTop="2dp" />
-    </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="6dp" />
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="12dp" />
+        <!-- 第二行：剪切 / 复制 / 粘贴 / 全选 -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
 
-    <!-- 编辑操作按钮：撤销 / 重做 / 退格 -->
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center">
+            <ImageView
+                android:id="@+id/nav_cut"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="8dp"
+                android:src="@drawable/ic_content_cut"
+                android:background="@drawable/bg_nav_action"
+                android:contentDescription="剪切"
+                android:layout_marginEnd="3dp" />
 
-        <ImageView
-            android:id="@+id/nav_undo"
-            android:layout_width="48dp"
-            android:layout_height="44dp"
-            android:padding="10dp"
-            android:src="@drawable/ic_undo"
-            android:background="@drawable/bg_nav_action"
-            android:contentDescription="撤销"
-            android:layout_marginEnd="4dp" />
+            <ImageView
+                android:id="@+id/nav_copy"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="8dp"
+                android:src="@drawable/ic_content_copy"
+                android:background="@drawable/bg_nav_action"
+                android:contentDescription="复制"
+                android:layout_marginStart="3dp"
+                android:layout_marginEnd="3dp" />
 
-        <ImageView
-            android:id="@+id/nav_redo"
-            android:layout_width="48dp"
-            android:layout_height="44dp"
-            android:padding="10dp"
-            android:src="@drawable/ic_redo"
-            android:background="@drawable/bg_nav_action"
-            android:contentDescription="重做"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp" />
+            <ImageView
+                android:id="@+id/nav_paste"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="8dp"
+                android:src="@drawable/ic_content_paste"
+                android:background="@drawable/bg_nav_action"
+                android:contentDescription="粘贴"
+                android:layout_marginStart="3dp"
+                android:layout_marginEnd="3dp" />
 
-        <ImageView
-            android:id="@+id/nav_backspace"
-            android:layout_width="48dp"
-            android:layout_height="44dp"
-            android:padding="10dp"
-            android:src="@drawable/ic_backspace"
-            android:background="@drawable/bg_nav_action"
-            android:contentDescription="退格"
-            android:layout_marginStart="4dp" />
-    </LinearLayout>
+            <ImageView
+                android:id="@+id/nav_select_all"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="8dp"
+                android:src="@drawable/ic_select_all"
+                android:background="@drawable/bg_nav_action"
+                android:contentDescription="全选"
+                android:layout_marginStart="3dp" />
+        </LinearLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="8dp" />
-
-    <!-- 剪切 / 复制 / 粘贴 / 全选 -->
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center">
-
-        <ImageView
-            android:id="@+id/nav_cut"
-            android:layout_width="48dp"
-            android:layout_height="44dp"
-            android:padding="10dp"
-            android:src="@drawable/ic_content_cut"
-            android:background="@drawable/bg_nav_action"
-            android:contentDescription="剪切"
-            android:layout_marginEnd="4dp" />
-
-        <ImageView
-            android:id="@+id/nav_copy"
-            android:layout_width="48dp"
-            android:layout_height="44dp"
-            android:padding="10dp"
-            android:src="@drawable/ic_content_copy"
-            android:background="@drawable/bg_nav_action"
-            android:contentDescription="复制"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp" />
-
-        <ImageView
-            android:id="@+id/nav_paste"
-            android:layout_width="48dp"
-            android:layout_height="44dp"
-            android:padding="10dp"
-            android:src="@drawable/ic_content_paste"
-            android:background="@drawable/bg_nav_action"
-            android:contentDescription="粘贴"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp" />
-
-        <ImageView
-            android:id="@+id/nav_select_all"
-            android:layout_width="48dp"
-            android:layout_height="44dp"
-            android:padding="10dp"
-            android:src="@drawable/ic_select_all"
-            android:background="@drawable/bg_nav_action"
-            android:contentDescription="全选"
-            android:layout_marginStart="4dp" />
     </LinearLayout>
 
 </LinearLayout>
