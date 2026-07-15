@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">KeyBridge</string>
+    <string name="settings_title">KeyBridge 设置</string>
+    <string name="enable_ime">启用输入法</string>
+    <string name="switch_ime">切换到 KeyBridge</string>
+    <string name="ime_description">一个完整的电脑键盘输入法，提供方向键、功能键和修饰键支持</string>
+</resources>

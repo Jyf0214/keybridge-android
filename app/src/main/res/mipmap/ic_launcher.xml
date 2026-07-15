@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- 蓝色背景圆角矩形 -->
+    <path
+        android:fillColor="#1565C0"
+        android:pathData="M4,4h40c2.2,0 4,1.8 4,4v32c0,2.2 -1.8,4 -4,4H4c-2.2,0 -4,-1.8 -4,-4V8C0,5.8 1.8,4 4,4z"/>
+    <!-- 键盘图案 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M32,14H8C6.3,14 5,15.3 5,17v14c0,1.7 1.3,3 3,3h24c1.7,0 3,-1.3 3,-3V17C35,15.3 33.7,14 32,14zM20,28h-6v-4h6V28zM20,22h-6v-4h6V22zM28,28h-4v-4h4V28zM28,22h-4v-4h4V22zM32,24h-2v-4h2V24z"/>
+</vector>
