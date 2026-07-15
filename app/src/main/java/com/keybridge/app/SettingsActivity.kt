@@ -228,7 +228,7 @@ private fun SettingsScreen() {
 
         // 第三步：开始测试（始终显示，任何输入法都能用）
         SetupCard(
-            icon = Icons.Default.PlayArrow,
+            icon = Icons.Default.CheckCircle,
             step = "第三步",
             title = "现在开始吧",
             description = "进入按键检测页面，验证输入法是否正常工作",
