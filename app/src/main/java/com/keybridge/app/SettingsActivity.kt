@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Keyboard
@@ -44,6 +46,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.keybridge.app.ui.theme.KeyBridgeTheme
 
 /**
@@ -120,8 +125,12 @@ private fun SettingsScreen() {
     val showSwitchReminder = remember { mutableStateOf(false) }
     val showFirstLaunchDialog = remember { mutableStateOf(!isImeEnabled.value) }
 
-    // 每次回到页面时刷新状态（不使用 LifecycleEventEffect，用 remember + 手动刷新）
-    // 因为 remember 只执行一次，所以我们需要在关键时机手动刷新
+    // 每次页面恢复时刷新 IME 状态（用户从系统设置返回时自动更新）
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        isImeEnabled.value = isImeEnabled(context)
+        currentImeName.value = getCurrentImeName(context)
+        isKeyBridgeActive.value = isKeyBridgeActive(context)
+    }
 
     // 首次安装引导弹窗
     if (showFirstLaunchDialog.value) {
@@ -156,8 +165,8 @@ private fun SettingsScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
+            .padding(24.dp)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(

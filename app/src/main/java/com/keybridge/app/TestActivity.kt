@@ -24,7 +24,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Keyboard
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,9 +34,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,16 +50,17 @@ import com.keybridge.app.ui.theme.KeyBridgeTheme
  * 按键检测日志条目
  */
 data class KeyEventLog(
-    val action: String,       // "按下" / "释放" / "组合"
-    val keyName: String,      // 按键名称
-    val keyCode: Int,         // KeyEvent 码
-    val modifiers: List<String>, // 修饰键
-    val isHardware: Boolean   // 是否来自外接键盘
+    val action: String,
+    val keyName: String,
+    val keyCode: Int,
+    val modifiers: List<String>,
+    val isHardware: Boolean
 )
 
 class TestActivity : ComponentActivity() {
 
     private val keyLogs = mutableStateListOf<KeyEventLog>()
+    private val inputText = mutableStateOf("")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,6 +68,26 @@ class TestActivity : ComponentActivity() {
             KeyBridgeTheme {
                 TestScreen(
                     keyLogs = keyLogs,
+                    inputText = inputText.value,
+                    onInputTextChange = { newValue ->
+                        // 软件键盘输入：检测新增的字符
+                        if (newValue.length > inputText.value.length) {
+                            val newChars = newValue.substring(inputText.value.length)
+                            newChars.forEach { char ->
+                                keyLogs.add(0, KeyEventLog(
+                                    action = "输入",
+                                    keyName = "'$char'",
+                                    keyCode = char.code,
+                                    modifiers = emptyList(),
+                                    isHardware = false
+                                ))
+                            }
+                            if (keyLogs.size > 100) {
+                                repeat(keyLogs.size - 100) { keyLogs.removeAt(keyLogs.lastIndex) }
+                            }
+                        }
+                        inputText.value = newValue
+                    },
                     onBack = { finish() }
                 )
             }
@@ -76,6 +95,7 @@ class TestActivity : ComponentActivity() {
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        // 硬件键盘和部分软件键盘的特殊键
         val log = KeyEventLog(
             action = "按下",
             keyName = getKeyName(keyCode),
@@ -89,7 +109,6 @@ class TestActivity : ComponentActivity() {
     }
 
     override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
-        // 只记录特殊键的释放
         if (isSpecialKey(keyCode)) {
             val log = KeyEventLog(
                 action = "释放",
@@ -137,8 +156,14 @@ class TestActivity : ComponentActivity() {
             KeyEvent.KEYCODE_PAGE_UP, KeyEvent.KEYCODE_PAGE_DOWN,
             KeyEvent.KEYCODE_INSERT, KeyEvent.KEYCODE_FORWARD_DEL,
             KeyEvent.KEYCODE_CAPS_LOCK, KeyEvent.KEYCODE_NUM_LOCK,
-            in KeyEvent.KEYCODE_F1..KeyEvent.KEYCODE_F12,
-            in KeyEvent.KEYCODE_CTRL_LEFT..KeyEvent.KEYCODE_META_RIGHT -> true
+            KeyEvent.KEYCODE_F1, KeyEvent.KEYCODE_F2, KeyEvent.KEYCODE_F3,
+            KeyEvent.KEYCODE_F4, KeyEvent.KEYCODE_F5, KeyEvent.KEYCODE_F6,
+            KeyEvent.KEYCODE_F7, KeyEvent.KEYCODE_F8, KeyEvent.KEYCODE_F9,
+            KeyEvent.KEYCODE_F10, KeyEvent.KEYCODE_F11, KeyEvent.KEYCODE_F12,
+            KeyEvent.KEYCODE_CTRL_LEFT, KeyEvent.KEYCODE_CTRL_RIGHT,
+            KeyEvent.KEYCODE_ALT_LEFT, KeyEvent.KEYCODE_ALT_RIGHT,
+            KeyEvent.KEYCODE_SHIFT_LEFT, KeyEvent.KEYCODE_SHIFT_RIGHT,
+            KeyEvent.KEYCODE_META_LEFT, KeyEvent.KEYCODE_META_RIGHT -> true
             else -> false
         }
     }
@@ -198,7 +223,18 @@ class TestActivity : ComponentActivity() {
             KeyEvent.KEYCODE_GRAVE -> "`"
             KeyEvent.KEYCODE_MINUS -> "-"
             KeyEvent.KEYCODE_EQUALS -> "="
-            in KeyEvent.KEYCODE_F1..KeyEvent.KEYCODE_F12 -> "F${keyCode - KeyEvent.KEYCODE_F1 + 1}"
+            KeyEvent.KEYCODE_F1 -> "F1"
+            KeyEvent.KEYCODE_F2 -> "F2"
+            KeyEvent.KEYCODE_F3 -> "F3"
+            KeyEvent.KEYCODE_F4 -> "F4"
+            KeyEvent.KEYCODE_F5 -> "F5"
+            KeyEvent.KEYCODE_F6 -> "F6"
+            KeyEvent.KEYCODE_F7 -> "F7"
+            KeyEvent.KEYCODE_F8 -> "F8"
+            KeyEvent.KEYCODE_F9 -> "F9"
+            KeyEvent.KEYCODE_F10 -> "F10"
+            KeyEvent.KEYCODE_F11 -> "F11"
+            KeyEvent.KEYCODE_F12 -> "F12"
             else -> "Key($keyCode)"
         }
     }
@@ -208,6 +244,8 @@ class TestActivity : ComponentActivity() {
 @Composable
 private fun TestScreen(
     keyLogs: List<KeyEventLog>,
+    inputText: String,
+    onInputTextChange: (String) -> Unit,
     onBack: () -> Unit
 ) {
     val listState = rememberLazyListState()
@@ -260,10 +298,10 @@ private fun TestScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // 输入框（点击后弹出键盘，Activity 的 onKeyDown 会捕获所有按键）
+            // 输入框（点击后弹出键盘，文字会显示）
             OutlinedTextField(
-                value = "",
-                onValueChange = {},
+                value = inputText,
+                onValueChange = onInputTextChange,
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text("点击此处开始输入测试") },
                 textStyle = MaterialTheme.typography.bodyLarge.copy(
@@ -296,7 +334,6 @@ private fun TestScreen(
 
             // 检测结果列表
             if (keyLogs.isEmpty()) {
-                // 空状态
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -341,14 +378,15 @@ private fun TestScreen(
 @Composable
 private fun KeyEventLogItem(log: KeyEventLog) {
     val backgroundColor = when {
-        log.isHardware -> Color(0xFFE8F5E9) // 绿色 - 外接键盘
-        log.modifiers.isNotEmpty() -> Color(0xFFFFF3E0) // 橙色 - 组合键
-        else -> Color(0xFFF5F5F5) // 灰色 - 普通按键
+        log.isHardware -> Color(0xFFE8F5E9)
+        log.modifiers.isNotEmpty() -> Color(0xFFFFF3E0)
+        else -> Color(0xFFF5F5F5)
     }
 
     val actionColor = when (log.action) {
         "按下" -> Color(0xFF1565C0)
         "释放" -> Color(0xFF666666)
+        "输入" -> Color(0xFF2E7D32)
         else -> Color(0xFFE65100)
     }
 
@@ -360,7 +398,6 @@ private fun KeyEventLogItem(log: KeyEventLog) {
             .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // 动作标签
         Text(
             text = log.action,
             fontSize = 11.sp,
@@ -371,7 +408,6 @@ private fun KeyEventLogItem(log: KeyEventLog) {
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        // 修饰键
         if (log.modifiers.isNotEmpty()) {
             Text(
                 text = log.modifiers.joinToString("+") + "+",
@@ -382,7 +418,6 @@ private fun KeyEventLogItem(log: KeyEventLog) {
             )
         }
 
-        // 按键名称
         Text(
             text = log.keyName,
             fontSize = 15.sp,
@@ -393,7 +428,6 @@ private fun KeyEventLogItem(log: KeyEventLog) {
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // 设备来源
         if (log.isHardware) {
             Text(
                 text = "⌨ 蓝牙",
@@ -403,7 +437,6 @@ private fun KeyEventLogItem(log: KeyEventLog) {
             )
         }
 
-        // KeyCode
         Text(
             text = "#${log.keyCode}",
             fontSize = 11.sp,
