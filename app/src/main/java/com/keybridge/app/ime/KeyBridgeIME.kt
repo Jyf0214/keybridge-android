@@ -111,20 +111,33 @@ class KeyBridgeIME : InputMethodService() {
             }
 
             KeyType.CHAR -> {
-                if (keyData.commitText != null) {
-                    keyEventSender.sendChar(inputConnection, keyData.commitText.first())
-                } else {
-                    val isShiftActive = modifierState.isActive(ModifierState.Modifier.SHIFT)
-                    val metaState = modifierState.getMetaState()
+                val ctrlActive = modifierState.isActive(ModifierState.Modifier.CTRL)
+                val altActive = modifierState.isActive(ModifierState.Modifier.ALT)
+                val shiftActive = modifierState.isActive(ModifierState.Modifier.SHIFT)
 
-                    if (isShiftActive && keyData.shiftLabel != null) {
-                        keyEventSender.sendChar(inputConnection, keyData.shiftLabel.first(), metaState)
-                    } else if (isShiftActive) {
-                        val char = getKeyLabel(keyData.keyCode).firstOrNull()
-                        if (char != null) keyEventSender.sendChar(inputConnection, char.uppercaseChar(), metaState)
+                // 如果有任何修饰键激活，发送组合键事件（如 Ctrl+C、Alt+X）
+                if (ctrlActive || altActive) {
+                    keyEventSender.handleModifierCombo(
+                        inputConnection, keyData.keyCode,
+                        ctrlActive, altActive, shiftActive
+                    )
+                } else {
+                    // 正常字符输入
+                    if (keyData.commitText != null) {
+                        val char = if (shiftActive) keyData.commitText.uppercase()
+                                   else keyData.commitText
+                        keyEventSender.sendChar(inputConnection, char.first())
                     } else {
-                        val char = getKeyLabel(keyData.keyCode).firstOrNull()
-                        if (char != null) keyEventSender.sendChar(inputConnection, char.lowercaseChar(), metaState)
+                        val metaState = modifierState.getMetaState()
+                        if (shiftActive && keyData.shiftLabel != null) {
+                            keyEventSender.sendChar(inputConnection, keyData.shiftLabel.first(), metaState)
+                        } else if (shiftActive) {
+                            val char = getKeyLabel(keyData.keyCode).firstOrNull()
+                            if (char != null) keyEventSender.sendChar(inputConnection, char.uppercaseChar(), metaState)
+                        } else {
+                            val char = getKeyLabel(keyData.keyCode).firstOrNull()
+                            if (char != null) keyEventSender.sendChar(inputConnection, char.lowercaseChar(), metaState)
+                        }
                     }
                 }
                 modifierState.onCharacterInput()
@@ -137,17 +150,54 @@ class KeyBridgeIME : InputMethodService() {
             }
 
             KeyType.SPECIAL -> {
-                val metaState = modifierState.getMetaState()
-                val handled = keyEventSender.handleModifierCombo(
-                    inputConnection,
-                    keyData.keyCode,
-                    modifierState.isActive(ModifierState.Modifier.CTRL),
-                    modifierState.isActive(ModifierState.Modifier.ALT)
-                )
-                if (!handled) {
-                    keyEventSender.sendKeyEvent(inputConnection, keyData.keyCode, metaState)
+                when (keyData.keyCode) {
+                    android.view.KeyEvent.KEYCODE_ENTER -> {
+                        // Enter 优先用 commitText("\n")，兼容性最好
+                        val metaState = modifierState.getMetaState()
+                        val handled = keyEventSender.handleModifierCombo(
+                            inputConnection, keyData.keyCode,
+                            modifierState.isActive(ModifierState.Modifier.CTRL),
+                            modifierState.isActive(ModifierState.Modifier.ALT),
+                            modifierState.isActive(ModifierState.Modifier.SHIFT)
+                        )
+                        if (!handled) {
+                            keyEventSender.sendChar(inputConnection, '\n')
+                        }
+                    }
+                    android.view.KeyEvent.KEYCODE_DEL -> {
+                        // Backspace 用 deleteSurroundingText，最可靠
+                        val metaState = modifierState.getMetaState()
+                        val handled = keyEventSender.handleModifierCombo(
+                            inputConnection, keyData.keyCode,
+                            modifierState.isActive(ModifierState.Modifier.CTRL),
+                            modifierState.isActive(ModifierState.Modifier.ALT),
+                            modifierState.isActive(ModifierState.Modifier.SHIFT)
+                        )
+                        if (!handled) {
+                            inputConnection?.deleteSurroundingText(1, 0)
+                        }
+                    }
+                    android.view.KeyEvent.KEYCODE_FORWARD_DEL -> {
+                        // Delete（向前删除）
+                        val handled = keyEventSender.handleModifierCombo(
+                            inputConnection, keyData.keyCode,
+                            modifierState.isActive(ModifierState.Modifier.CTRL),
+                            modifierState.isActive(ModifierState.Modifier.ALT),
+                            modifierState.isActive(ModifierState.Modifier.SHIFT)
+                        )
+                        if (!handled) {
+                            inputConnection?.deleteSurroundingText(0, 1)
+                        }
+                    }
+                    else -> {
+                        // 其他特殊键（Tab、Esc、CapsLock 等）
+                        val metaState = modifierState.getMetaState()
+                        keyEventSender.sendKeyEvent(inputConnection, keyData.keyCode, metaState)
+                    }
                 }
-                if (keyData.keyCode == android.view.KeyEvent.KEYCODE_ENTER) {
+                // Enter 和 Backspace 输入后也清理临时修饰键
+                if (keyData.keyCode == android.view.KeyEvent.KEYCODE_ENTER ||
+                    keyData.keyCode == android.view.KeyEvent.KEYCODE_DEL) {
                     modifierState.onCharacterInput()
                     updateModifierVisual()
                 }

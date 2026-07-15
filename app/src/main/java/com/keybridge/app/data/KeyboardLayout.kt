@@ -51,8 +51,8 @@ object KeyboardLayout {
             KeyData("8", KeyEvent.KEYCODE_8, KeyType.CHAR, 1f, shiftLabel = "*"),
             KeyData("9", KeyEvent.KEYCODE_9, KeyType.CHAR, 1f, shiftLabel = "("),
             KeyData("0", KeyEvent.KEYCODE_0, KeyType.CHAR, 1f, shiftLabel = ")"),
-            KeyData("-", KeyEvent.KEYCODE_MINUS, KeyType.CHAR, 1f),
-            KeyData("=", KeyEvent.KEYCODE_EQUALS, KeyType.CHAR, 1f),
+            KeyData("-", KeyEvent.KEYCODE_MINUS, KeyType.CHAR, 1f, commitText = "-"),
+            KeyData("=", KeyEvent.KEYCODE_EQUALS, KeyType.CHAR, 1f, commitText = "="),
             KeyData("Del", KeyEvent.KEYCODE_DEL, KeyType.SPECIAL, 1.8f)
         ),
         // Row 2: QWERTY
@@ -68,9 +68,9 @@ object KeyboardLayout {
             KeyData("I", KeyEvent.KEYCODE_I, KeyType.CHAR),
             KeyData("O", KeyEvent.KEYCODE_O, KeyType.CHAR),
             KeyData("P", KeyEvent.KEYCODE_P, KeyType.CHAR),
-            KeyData("[", KeyEvent.KEYCODE_LEFT_BRACKET, KeyType.CHAR, 1f),
-            KeyData("]", KeyEvent.KEYCODE_RIGHT_BRACKET, KeyType.CHAR, 1f),
-            KeyData("\\", KeyEvent.KEYCODE_BACKSLASH, KeyType.CHAR, 1.3f)
+            KeyData("[", KeyEvent.KEYCODE_LEFT_BRACKET, KeyType.CHAR, 1f, commitText = "["),
+            KeyData("]", KeyEvent.KEYCODE_RIGHT_BRACKET, KeyType.CHAR, 1f, commitText = "]"),
+            KeyData("\\", KeyEvent.KEYCODE_BACKSLASH, KeyType.CHAR, 1.3f, commitText = "\\")
         ),
         // Row 3: Home 行
         listOf(
@@ -84,8 +84,8 @@ object KeyboardLayout {
             KeyData("J", KeyEvent.KEYCODE_J, KeyType.CHAR),
             KeyData("K", KeyEvent.KEYCODE_K, KeyType.CHAR),
             KeyData("L", KeyEvent.KEYCODE_L, KeyType.CHAR),
-            KeyData(";", KeyEvent.KEYCODE_SEMICOLON, KeyType.CHAR),
-            KeyData("'", KeyEvent.KEYCODE_APOSTROPHE, KeyType.CHAR),
+            KeyData(";", KeyEvent.KEYCODE_SEMICOLON, KeyType.CHAR, commitText = ";"),
+            KeyData("'", KeyEvent.KEYCODE_APOSTROPHE, KeyType.CHAR, commitText = "'"),
             KeyData("Enter", KeyEvent.KEYCODE_ENTER, KeyType.SPECIAL, 2.2f)
         ),
         // Row 4: Shift 行
@@ -98,9 +98,9 @@ object KeyboardLayout {
             KeyData("B", KeyEvent.KEYCODE_B, KeyType.CHAR),
             KeyData("N", KeyEvent.KEYCODE_N, KeyType.CHAR),
             KeyData("M", KeyEvent.KEYCODE_M, KeyType.CHAR),
-            KeyData(",", KeyEvent.KEYCODE_COMMA, KeyType.CHAR),
-            KeyData(".", KeyEvent.KEYCODE_PERIOD, KeyType.CHAR),
-            KeyData("/", KeyEvent.KEYCODE_SLASH, KeyType.CHAR),
+            KeyData(",", KeyEvent.KEYCODE_COMMA, KeyType.CHAR, commitText = ","),
+            KeyData(".", KeyEvent.KEYCODE_PERIOD, KeyType.CHAR, commitText = "."),
+            KeyData("/", KeyEvent.KEYCODE_SLASH, KeyType.CHAR, commitText = "/"),
             KeyData("Shift", KeyEvent.KEYCODE_SHIFT_RIGHT, KeyType.MODIFIER, 2.2f)
         ),
         // Row 5: 底部控制行 + 方向键

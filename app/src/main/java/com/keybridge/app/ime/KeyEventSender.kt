@@ -69,25 +69,25 @@ class KeyEventSender {
     }
 
     /**
-     * 处理修饰键组合（如 Ctrl+C）
+     * 处理修饰键组合（如 Ctrl+C、Ctrl+Shift+T）
      * 返回是否已处理（即是否为组合键）
      */
     fun handleModifierCombo(
         inputConnection: InputConnection?,
         keyCode: Int,
         ctrlActive: Boolean,
-        altActive: Boolean
+        altActive: Boolean,
+        shiftActive: Boolean = false
     ): Boolean {
-        if (!ctrlActive && !altActive) return false
+        if (!ctrlActive && !altActive && !shiftActive) return false
 
         inputConnection ?: return false
 
-        val now = System.currentTimeMillis()
         var meta = 0
         if (ctrlActive) meta = meta or KeyEvent.META_CTRL_ON
         if (altActive) meta = meta or KeyEvent.META_ALT_ON
+        if (shiftActive) meta = meta or KeyEvent.META_SHIFT_ON
 
-        // 发送组合键
         sendKeyEvent(inputConnection, keyCode, meta)
         return true
     }

@@ -137,7 +137,7 @@ class KeyboardView @JvmOverloads constructor(
 
                 val paint = when {
                     isPressed -> pressedKeyPaint
-                    isActive -> activeTextPaint
+                    isActive -> activeKeyPaint
                     keyData.type == KeyType.MODIFIER || keyData.type == KeyType.SPECIAL -> specialKeyPaint
                     else -> keyPaint
                 }
