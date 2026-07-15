@@ -1,83 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/keyboard_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/transparent">
 
-    <!-- 浮动键盘卡片（横屏时缩小并可拖拽，竖屏时全宽） -->
-    <LinearLayout
+    <!-- 浮动键盘卡片：CardView 自动裁剪子 View 到圆角轮廓 -->
+    <androidx.cardview.widget.CardView
         android:id="@+id/keyboard_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:orientation="vertical"
-        android:background="@drawable/bg_floating_card"
-        android:clipToPadding="true"
-        android:padding="4dp">
+        app:cardCornerRadius="16dp"
+        app:cardBackgroundColor="#F1F3F4"
+        app:cardElevation="4dp"
+        app:cardUseCompatPadding="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="4dp">
 
         <!-- 工具栏：修饰键状态 + 方向键切换 -->
         <LinearLayout
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="38dp"
+            android:layout_height="wrap_content"
+            android:minHeight="36dp"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:paddingStart="8dp"
+            android:paddingStart="6dp"
             android:paddingEnd="4dp"
+            android:paddingTop="3dp"
+            android:paddingBottom="3dp"
             android:background="#E8EAED">
 
-            <!-- 修饰键状态 -->
-            <TextView
-                android:id="@+id/mod_shift"
-                android:layout_width="wrap_content"
-                android:layout_height="24dp"
-                android:gravity="center"
-                android:text="Shift"
-                android:textSize="11sp"
-                android:textColor="#999999"
-                android:paddingStart="6dp"
-                android:paddingEnd="6dp"
-                android:visibility="gone" />
+            <!-- 修饰键状态：用 FlowLayout 概念，自动换行 -->
+            <LinearLayout
+                android:id="@+id/mod_status_container"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
-            <TextView
-                android:id="@+id/mod_ctrl"
-                android:layout_width="wrap_content"
-                android:layout_height="24dp"
-                android:gravity="center"
-                android:text="Ctrl"
-                android:textSize="11sp"
-                android:textColor="#999999"
-                android:paddingStart="6dp"
-                android:paddingEnd="6dp"
-                android:layout_marginStart="4dp"
-                android:visibility="gone" />
+                <TextView
+                    android:id="@+id/mod_shift"
+                    android:layout_width="wrap_content"
+                    android:layout_height="22dp"
+                    android:gravity="center"
+                    android:text="Shift"
+                    android:textSize="10sp"
+                    android:textColor="#FFFFFF"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:background="#1A73E8"
+                    android:visibility="gone" />
 
-            <TextView
-                android:id="@+id/mod_alt"
-                android:layout_width="wrap_content"
-                android:layout_height="24dp"
-                android:gravity="center"
-                android:text="Alt"
-                android:textSize="11sp"
-                android:textColor="#999999"
-                android:paddingStart="6dp"
-                android:paddingEnd="6dp"
-                android:layout_marginStart="4dp"
-                android:visibility="gone" />
+                <TextView
+                    android:id="@+id/mod_ctrl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="22dp"
+                    android:gravity="center"
+                    android:text="Ctrl"
+                    android:textSize="10sp"
+                    android:textColor="#FFFFFF"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:background="#1A73E8"
+                    android:layout_marginStart="3dp"
+                    android:visibility="gone" />
 
-            <TextView
-                android:id="@+id/mod_meta"
-                android:layout_width="wrap_content"
-                android:layout_height="24dp"
-                android:gravity="center"
-                android:text="Meta"
-                android:textSize="11sp"
-                android:textColor="#999999"
-                android:paddingStart="6dp"
-                android:paddingEnd="6dp"
-                android:layout_marginStart="4dp"
-                android:visibility="gone" />
+                <TextView
+                    android:id="@+id/mod_alt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="22dp"
+                    android:gravity="center"
+                    android:text="Alt"
+                    android:textSize="10sp"
+                    android:textColor="#FFFFFF"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:background="#1A73E8"
+                    android:layout_marginStart="3dp"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/mod_meta"
+                    android:layout_width="wrap_content"
+                    android:layout_height="22dp"
+                    android:gravity="center"
+                    android:text="Meta"
+                    android:textSize="10sp"
+                    android:textColor="#FFFFFF"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:background="#1A73E8"
+                    android:layout_marginStart="3dp"
+                    android:visibility="gone" />
+            </LinearLayout>
 
             <View
                 android:layout_width="0dp"
@@ -109,6 +132,7 @@
             android:layout_height="wrap_content"
             android:visibility="gone" />
 
-    </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
 </FrameLayout>

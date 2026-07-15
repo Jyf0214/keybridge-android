@@ -12,6 +12,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import com.keybridge.app.R
 import com.keybridge.app.data.KeyData
 import com.keybridge.app.data.KeyType
@@ -29,7 +30,7 @@ class KeyBridgeIME : InputMethodService() {
     private lateinit var keyEventSender: KeyEventSender
     private var keyboardView: KeyboardView? = null
     private var rootLayout: View? = null
-    private var keyboardCard: LinearLayout? = null
+    private var keyboardCard: CardView? = null
 
     // 工具栏
     private var toolbar: View? = null

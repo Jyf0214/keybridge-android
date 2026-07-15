@@ -99,7 +99,7 @@
         android:layout_weight="4"
         android:orientation="vertical"
         android:gravity="center"
-        android:paddingStart="4dp">
+        android:paddingStart="2dp">
 
         <!-- 第一行：撤销 / 重做 / 退格 -->
         <LinearLayout
@@ -110,39 +110,42 @@
 
             <ImageView
                 android:id="@+id/nav_undo"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:padding="8dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:padding="7dp"
+                android:scaleType="centerInside"
                 android:src="@drawable/ic_undo"
                 android:background="@drawable/bg_nav_action"
                 android:contentDescription="撤销"
-                android:layout_marginEnd="3dp" />
+                android:layout_marginEnd="2dp" />
 
             <ImageView
                 android:id="@+id/nav_redo"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:padding="8dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:padding="7dp"
+                android:scaleType="centerInside"
                 android:src="@drawable/ic_redo"
                 android:background="@drawable/bg_nav_action"
                 android:contentDescription="重做"
-                android:layout_marginStart="3dp"
-                android:layout_marginEnd="3dp" />
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="2dp" />
 
             <ImageView
                 android:id="@+id/nav_backspace"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:padding="8dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:padding="7dp"
+                android:scaleType="centerInside"
                 android:src="@drawable/ic_backspace"
                 android:background="@drawable/bg_nav_action"
                 android:contentDescription="退格"
-                android:layout_marginStart="3dp" />
+                android:layout_marginStart="2dp" />
         </LinearLayout>
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="6dp" />
+            android:layout_height="4dp" />
 
         <!-- 第二行：剪切 / 复制 / 粘贴 / 全选 -->
         <LinearLayout
@@ -153,45 +156,49 @@
 
             <ImageView
                 android:id="@+id/nav_cut"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:padding="8dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:padding="7dp"
+                android:scaleType="centerInside"
                 android:src="@drawable/ic_content_cut"
                 android:background="@drawable/bg_nav_action"
                 android:contentDescription="剪切"
-                android:layout_marginEnd="3dp" />
+                android:layout_marginEnd="2dp" />
 
             <ImageView
                 android:id="@+id/nav_copy"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:padding="8dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:padding="7dp"
+                android:scaleType="centerInside"
                 android:src="@drawable/ic_content_copy"
                 android:background="@drawable/bg_nav_action"
                 android:contentDescription="复制"
-                android:layout_marginStart="3dp"
-                android:layout_marginEnd="3dp" />
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="2dp" />
 
             <ImageView
                 android:id="@+id/nav_paste"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:padding="8dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:padding="7dp"
+                android:scaleType="centerInside"
                 android:src="@drawable/ic_content_paste"
                 android:background="@drawable/bg_nav_action"
                 android:contentDescription="粘贴"
-                android:layout_marginStart="3dp"
-                android:layout_marginEnd="3dp" />
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="2dp" />
 
             <ImageView
                 android:id="@+id/nav_select_all"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:padding="8dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:padding="7dp"
+                android:scaleType="centerInside"
                 android:src="@drawable/ic_select_all"
                 android:background="@drawable/bg_nav_action"
                 android:contentDescription="全选"
-                android:layout_marginStart="3dp" />
+                android:layout_marginStart="2dp" />
         </LinearLayout>
 
     </LinearLayout>
