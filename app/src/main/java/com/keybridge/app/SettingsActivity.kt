@@ -58,15 +58,14 @@ private fun isImeEnabled(context: Context): Boolean {
 
 /**
  * 检测当前输入法是否为 KeyBridge
- * 通过 Settings.Secure.DEFAULT_INPUT_METHOD 精确判断
+ * 使用 contains 匹配，兼容不同格式的组件名
  */
 private fun isKeyBridgeActive(context: Context): Boolean {
     val currentIme = Settings.Secure.getString(
         context.contentResolver,
         Settings.Secure.DEFAULT_INPUT_METHOD
     ) ?: return false
-    val serviceComponent = "${context.packageName}/com.keybridge.app.ime.KeyBridgeIME"
-    return currentIme == serviceComponent
+    return currentIme.contains(context.packageName)
 }
 
 /**
@@ -190,68 +189,173 @@ private fun SettingsScreen() {
         Spacer(modifier = Modifier.height(40.dp))
 
         // 第一步：启用
-        SetupCard(
-            icon = Icons.Default.Settings,
-            step = "第一步",
-            title = "启用输入法",
-            description = "在系统设置中启用 KeyBridge 输入法",
-            buttonText = "打开设置",
-            completed = isImeEnabled.value,
-            onClick = {
-                val intent = Intent(Settings.ACTION_INPUT_METHOD_SETTINGS).apply {
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = if (isImeEnabled.value)
+                    MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                else
+                    MaterialTheme.colorScheme.surfaceVariant
+            )
+        ) {
+            Column(modifier = Modifier.padding(20.dp)) {
+                Icon(
+                    imageVector = if (isImeEnabled.value) Icons.Default.CheckCircle else Icons.Default.Settings,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(28.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = if (isImeEnabled.value) "✅ 第一步" else "第一步",
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Medium
+                )
+                Text(
+                    text = "启用输入法",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "在系统设置中启用 KeyBridge 输入法",
+                    fontSize = 13.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                Button(
+                    onClick = {
+                        val intent = Intent(Settings.ACTION_INPUT_METHOD_SETTINGS).apply {
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        }
+                        context.startActivity(intent)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (isImeEnabled.value) MaterialTheme.colorScheme.secondary
+                        else MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    Text(text = if (isImeEnabled.value) "已完成" else "打开设置")
                 }
-                context.startActivity(intent)
             }
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // 第二步：切换（显示当前输入法名称）
-        val step2Description = if (isKeyBridgeActive.value) {
-            "✅ 当前输入法：${currentImeName.value}"
-        } else {
-            "当前输入法：${currentImeName.value}（非 KeyBridge）"
         }
-        val step2Completed = isKeyBridgeActive.value
-
-        SetupCard(
-            icon = Icons.Default.Keyboard,
-            step = "第二步",
-            title = "切换输入法",
-            description = step2Description,
-            buttonText = "切换输入法",
-            completed = step2Completed,
-            enabled = isImeEnabled.value,
-            onClick = {
-                val imeManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                imeManager.showInputMethodPicker()
-            }
-        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // 第三步：开始测试（始终显示，任何输入法都能用）
-        SetupCard(
-            icon = Icons.Default.Keyboard,
-            step = "第三步",
-            title = "现在开始吧",
-            description = "进入按键检测页面，验证输入法是否正常工作",
-            buttonText = "开始测试",
-            completed = false,
-            enabled = true,
-            onClick = {
-                // 检查是否切换到了 KeyBridge
-                if (isKeyBridgeActive(context)) {
-                    context.startActivity(Intent(context, TestActivity::class.java))
-                } else {
-                    // 弹窗提醒
-                    currentImeName.value = getCurrentImeName(context)
-                    isKeyBridgeActive.value = isKeyBridgeActive(context)
-                    showSwitchReminder.value = true
+        // 第二步：切换
+        val isCurrentKeyBridge = isKeyBridgeActive.value
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = if (isCurrentKeyBridge)
+                    MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                else
+                    MaterialTheme.colorScheme.surfaceVariant
+            )
+        ) {
+            Column(modifier = Modifier.padding(20.dp)) {
+                Icon(
+                    imageVector = if (isCurrentKeyBridge) Icons.Default.CheckCircle else Icons.Default.Keyboard,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(28.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = if (isCurrentKeyBridge) "✅ 第二步" else "第二步",
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Medium
+                )
+                Text(
+                    text = "切换输入法",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "当前输入法：${currentImeName.value}",
+                    fontSize = 13.sp,
+                    color = if (isCurrentKeyBridge) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                Button(
+                    onClick = {
+                        val imeManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                        imeManager.showInputMethodPicker()
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = isImeEnabled.value,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (isCurrentKeyBridge) MaterialTheme.colorScheme.secondary
+                        else MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    Text(text = if (isCurrentKeyBridge) "已完成" else "切换输入法")
                 }
             }
-        )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // 第三步：开始测试
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+        ) {
+            Column(modifier = Modifier.padding(20.dp)) {
+                Icon(
+                    imageVector = Icons.Default.PlayArrow,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(28.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "第三步",
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Medium
+                )
+                Text(
+                    text = "现在开始吧",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "进入按键检测页面，验证输入法是否正常工作",
+                    fontSize = 13.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                Button(
+                    onClick = {
+                        if (isKeyBridgeActive(context)) {
+                            context.startActivity(Intent(context, TestActivity::class.java))
+                        } else {
+                            currentImeName.value = getCurrentImeName(context)
+                            isKeyBridgeActive.value = isKeyBridgeActive(context)
+                            showSwitchReminder.value = true
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    Text(text = "开始测试")
+                }
+            }
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
