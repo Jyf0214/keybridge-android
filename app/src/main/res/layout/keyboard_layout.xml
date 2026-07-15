@@ -4,8 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="#E8E8E8"
-    android:padding="2dp">
+    android:background="#F1F3F4"
+    android:padding="4dp">
 
     <!-- 工具栏：修饰键状态 + 方向键切换 -->
     <LinearLayout
@@ -16,7 +16,7 @@
         android:gravity="center_vertical"
         android:paddingStart="8dp"
         android:paddingEnd="4dp"
-        android:background="#D0D0D0">
+        android:background="#E8EAED">
 
         <!-- 修饰键状态 -->
         <TextView
@@ -76,15 +76,14 @@
             android:layout_weight="1" />
 
         <!-- 方向键切换按钮 -->
-        <TextView
+        <ImageView
             android:id="@+id/btn_nav_toggle"
             android:layout_width="34dp"
             android:layout_height="30dp"
-            android:gravity="center"
-            android:text="✜"
-            android:textSize="18sp"
-            android:textColor="#555555"
-            android:background="@drawable/bg_nav_action" />
+            android:padding="5dp"
+            android:src="@drawable/ic_nav_toggle"
+            android:background="@drawable/bg_nav_action"
+            android:contentDescription="切换导航页面" />
     </LinearLayout>
 
     <!-- 键盘内容区域（普通键盘） -->

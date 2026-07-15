@@ -5,6 +5,7 @@ import android.inputmethodservice.InputMethodService
 import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.ViewCompat
@@ -14,6 +15,7 @@ import com.keybridge.app.data.KeyData
 import com.keybridge.app.data.KeyType
 import com.keybridge.app.data.KeyboardLayout
 import com.keybridge.app.data.ModifierState
+import com.keybridge.app.event.EventLog
 
 /**
  * KeyBridge 输入法核心服务
@@ -31,7 +33,7 @@ class KeyBridgeIME : InputMethodService() {
     private var modCtrl: TextView? = null
     private var modAlt: TextView? = null
     private var modMeta: TextView? = null
-    private var btnNavToggle: TextView? = null
+    private var btnNavToggle: ImageView? = null
 
     // 页面切换
     private var isNavPage = false
@@ -153,7 +155,7 @@ class KeyBridgeIME : InputMethodService() {
                     start()
                 }
             }, duration)
-            btnNavToggle?.text = "✜"
+            btnNavToggle?.setImageResource(R.drawable.ic_nav_toggle)
         } else {
             // 普通 → 导航：键盘淡出，导航淡入
             targetAlpha = 0f
@@ -170,7 +172,7 @@ class KeyBridgeIME : InputMethodService() {
                     start()
                 }
             }, duration)
-            btnNavToggle?.text = "⌨"
+            btnNavToggle?.setImageResource(R.drawable.ic_keyboard)
         }
         isNavPage = !isNavPage
     }
@@ -241,6 +243,9 @@ class KeyBridgeIME : InputMethodService() {
                 val shiftActive = modifierState.isActive(ModifierState.Modifier.SHIFT)
 
                 if (ctrlActive || altActive) {
+                    // 组合键（Ctrl+C、Alt+X 等）——记录到事件日志
+                    val metaState = modifierState.getMetaState()
+                    EventLog.logKey("组合键", keyData.keyCode, metaState)
                     keyEventSender.handleModifierCombo(
                         inputConnection, keyData.keyCode,
                         ctrlActive, altActive, shiftActive
@@ -249,17 +254,25 @@ class KeyBridgeIME : InputMethodService() {
                     if (keyData.commitText != null) {
                         val char = if (shiftActive) keyData.commitText.uppercase()
                                    else keyData.commitText
+                        EventLog.logChar(char.first())
                         keyEventSender.sendChar(inputConnection, char.first())
                     } else {
                         val metaState = modifierState.getMetaState()
                         if (shiftActive && keyData.shiftLabel != null) {
+                            EventLog.logChar(keyData.shiftLabel.first())
                             keyEventSender.sendChar(inputConnection, keyData.shiftLabel.first(), metaState)
                         } else if (shiftActive) {
                             val char = getKeyLabel(keyData.keyCode).firstOrNull()
-                            if (char != null) keyEventSender.sendChar(inputConnection, char.uppercaseChar(), metaState)
+                            if (char != null) {
+                                EventLog.logChar(char.uppercaseChar())
+                                keyEventSender.sendChar(inputConnection, char.uppercaseChar(), metaState)
+                            }
                         } else {
                             val char = getKeyLabel(keyData.keyCode).firstOrNull()
-                            if (char != null) keyEventSender.sendChar(inputConnection, char.lowercaseChar(), metaState)
+                            if (char != null) {
+                                EventLog.logChar(char.lowercaseChar())
+                                keyEventSender.sendChar(inputConnection, char.lowercaseChar(), metaState)
+                            }
                         }
                     }
                 }
@@ -270,10 +283,13 @@ class KeyBridgeIME : InputMethodService() {
 
             KeyType.NAVIGATION -> {
                 val metaState = modifierState.getMetaState()
+                EventLog.logKey("按下", keyData.keyCode, metaState)
                 keyEventSender.sendKeyEvent(inputConnection, keyData.keyCode, metaState)
             }
 
             KeyType.SPECIAL -> {
+                val metaState = modifierState.getMetaState()
+                EventLog.logKey("按下", keyData.keyCode, metaState)
                 when (keyData.keyCode) {
                     KeyEvent.KEYCODE_ENTER -> {
                         val handled = keyEventSender.handleModifierCombo(
@@ -323,6 +339,7 @@ class KeyBridgeIME : InputMethodService() {
 
             KeyType.FUNCTION -> {
                 val metaState = modifierState.getMetaState()
+                EventLog.logKey("按下", keyData.keyCode, metaState)
                 keyEventSender.sendKeyEvent(inputConnection, keyData.keyCode, metaState)
             }
         }

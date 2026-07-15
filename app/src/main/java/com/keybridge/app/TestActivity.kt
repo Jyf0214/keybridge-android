@@ -61,6 +61,37 @@ class TestActivity : ComponentActivity() {
 
     private val keyLogs = mutableStateListOf<KeyEventLog>()
     private val inputText = mutableStateOf("")
+    private var lastImeEventCount = 0
+
+    private val imeListener: () -> Unit = { mergeImeEvents() }
+
+    private fun mergeImeEvents() {
+        val imeEvents = com.keybridge.app.event.EventLog.snapshot()
+        if (imeEvents.size <= lastImeEventCount) return
+        val newEvents = imeEvents.take(imeEvents.size - lastImeEventCount)
+        lastImeEventCount = imeEvents.size
+
+        // 转换为 TestActivity 的 KeyEventLog 并合并
+        newEvents.reversed().forEach { entry ->
+            val log = KeyEventLog(
+                action = entry.action,
+                keyName = entry.keyName,
+                keyCode = entry.keyCode,
+                modifiers = entry.modifiers,
+                isHardware = false
+            )
+            // 避免重复：检查是否已有相同 action+keyCode 的最近事件
+            val isDuplicate = keyLogs.take(3).any {
+                it.action == log.action && it.keyCode == log.keyCode
+            }
+            if (!isDuplicate) {
+                keyLogs.add(0, log)
+            }
+        }
+        if (keyLogs.size > 100) {
+            repeat(keyLogs.size - 100) { keyLogs.removeAt(keyLogs.lastIndex) }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,17 +101,23 @@ class TestActivity : ComponentActivity() {
                     keyLogs = keyLogs,
                     inputText = inputText.value,
                     onInputTextChange = { newValue ->
-                        // 软件键盘输入：检测新增的字符
+                        // 字符输入：从 IME 事件日志中获取，不重复记录
                         if (newValue.length > inputText.value.length) {
                             val newChars = newValue.substring(inputText.value.length)
+                            // 检查 IME 事件日志中是否已记录这些字符
+                            val imeSnap = com.keybridge.app.event.EventLog.snapshot()
+                            val imeRecentKeys = imeSnap.take(5).map { it.keyName }
                             newChars.forEach { char ->
-                                keyLogs.add(0, KeyEventLog(
-                                    action = "输入",
-                                    keyName = "'$char'",
-                                    keyCode = char.code,
-                                    modifiers = emptyList(),
-                                    isHardware = false
-                                ))
+                                val charStr = "'$char'"
+                                if (charStr !in imeRecentKeys) {
+                                    keyLogs.add(0, KeyEventLog(
+                                        action = "输入",
+                                        keyName = charStr,
+                                        keyCode = char.code,
+                                        modifiers = emptyList(),
+                                        isHardware = true
+                                    ))
+                                }
                             }
                             if (keyLogs.size > 100) {
                                 repeat(keyLogs.size - 100) { keyLogs.removeAt(keyLogs.lastIndex) }
@@ -94,8 +131,20 @@ class TestActivity : ComponentActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        com.keybridge.app.event.EventLog.addListener(imeListener)
+        // 同步已有 IME 事件
+        lastImeEventCount = com.keybridge.app.event.EventLog.snapshot().size
+    }
+
+    override fun onPause() {
+        super.onPause()
+        com.keybridge.app.event.EventLog.removeListener(imeListener)
+    }
+
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        // 硬件键盘和部分软件键盘的特殊键
+        // 硬件键盘事件
         val log = KeyEventLog(
             action = "按下",
             keyName = getKeyName(keyCode),

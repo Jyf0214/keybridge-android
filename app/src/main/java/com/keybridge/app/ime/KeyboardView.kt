@@ -29,45 +29,45 @@ class KeyboardView @JvmOverloads constructor(
     // 键盘布局数据
     private var rows: List<List<KeyData>> = emptyList()
 
-    // 绘制工具
+    // 绘制工具 —— 现代 Material You 配色
     private val keyPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.WHITE
         style = Paint.Style.FILL
     }
     private val keyStrokePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#CCCCCC")
+        color = Color.TRANSPARENT
         style = Paint.Style.STROKE
-        strokeWidth = 1f
+        strokeWidth = 0f
     }
     private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#333333")
+        color = Color.parseColor("#202124")
         textSize = 36f
         textAlign = Paint.Align.CENTER
-        typeface = Typeface.DEFAULT
+        typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
     }
     private val activeTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.WHITE
         textSize = 36f
         textAlign = Paint.Align.CENTER
-        typeface = Typeface.DEFAULT_BOLD
+        typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
     }
     private val activeKeyPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#1565C0")
+        color = Color.parseColor("#1A73E8")
         style = Paint.Style.FILL
     }
     private val specialKeyPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#D8D8D8")
+        color = Color.parseColor("#E8EAED")
         style = Paint.Style.FILL
     }
     private val pressedKeyPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = Color.parseColor("#BBDDFF")
+        color = Color.parseColor("#D2E3FC")
         style = Paint.Style.FILL
     }
 
-    // 按键尺寸
-    private val keyMargin = 4f
-    private val keyCornerRadius = 12f
-    private val keyHeight = 90f
+    // 按键尺寸 —— 更大间距，更圆润
+    private val keyMargin = 5f
+    private val keyCornerRadius = 10f
+    private val keyHeight = 86f
     private val keyRect = RectF()
 
     // 按键区域列表（用于触摸检测）
@@ -164,9 +164,9 @@ class KeyboardView @JvmOverloads constructor(
                     p.color = Color.WHITE
                 } else {
                     p.color = when {
-                        keyData.type == KeyType.MODIFIER -> Color.parseColor("#333333")
-                        keyData.type == KeyType.SPECIAL -> Color.parseColor("#1565C0")
-                        else -> Color.parseColor("#333333")
+                        keyData.type == KeyType.MODIFIER -> Color.parseColor("#5F6368")
+                        keyData.type == KeyType.SPECIAL -> Color.parseColor("#1A73E8")
+                        else -> Color.parseColor("#202124")
                     }
                 }
 

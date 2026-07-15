@@ -252,7 +252,7 @@ private fun SettingsScreen(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = if (isImeEnabled.value) "✅ 第一步" else "第一步",
+                    text = "第一步",
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Medium
@@ -310,7 +310,7 @@ private fun SettingsScreen(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = if (isCurrentKeyBridge) "✅ 第二步" else "第二步",
+                    text = "第二步",
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Medium
@@ -435,7 +435,7 @@ private fun SettingsScreen(
             exit = fadeOut()
         ) {
             Text(
-                text = "✅ KeyBridge 已启用并激活",
+                text = "KeyBridge 已启用并激活",
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Medium
             )
@@ -617,7 +617,7 @@ private fun SetupCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = if (completed) "✅ $step" else step,
+                text = step,
                 fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Medium

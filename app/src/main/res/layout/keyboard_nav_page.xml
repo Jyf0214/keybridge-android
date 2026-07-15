@@ -7,7 +7,6 @@
     android:gravity="center">
 
     <!-- 方向键区域：倒 T 形 -->
-    <!-- 上 -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -26,7 +25,6 @@
             android:layout_marginEnd="2dp" />
     </LinearLayout>
 
-    <!-- ← · → -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -66,7 +64,6 @@
             android:layout_marginStart="2dp" />
     </LinearLayout>
 
-    <!-- 下 -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -85,109 +82,100 @@
             android:layout_marginTop="2dp" />
     </LinearLayout>
 
-    <!-- 间距 -->
     <View
         android:layout_width="match_parent"
         android:layout_height="12dp" />
 
-    <!-- 编辑操作按钮 -->
+    <!-- 编辑操作按钮：撤销 / 重做 / 退格 -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center">
 
-        <TextView
+        <ImageView
             android:id="@+id/nav_undo"
-            android:layout_width="64dp"
+            android:layout_width="48dp"
             android:layout_height="44dp"
-            android:gravity="center"
-            android:text="↶"
-            android:textSize="22sp"
-            android:textColor="#333333"
+            android:padding="10dp"
+            android:src="@drawable/ic_undo"
             android:background="@drawable/bg_nav_action"
+            android:contentDescription="撤销"
             android:layout_marginEnd="4dp" />
 
-        <TextView
+        <ImageView
             android:id="@+id/nav_redo"
-            android:layout_width="64dp"
+            android:layout_width="48dp"
             android:layout_height="44dp"
-            android:gravity="center"
-            android:text="↷"
-            android:textSize="22sp"
-            android:textColor="#333333"
+            android:padding="10dp"
+            android:src="@drawable/ic_redo"
             android:background="@drawable/bg_nav_action"
+            android:contentDescription="重做"
             android:layout_marginStart="4dp"
             android:layout_marginEnd="4dp" />
 
-        <TextView
+        <ImageView
             android:id="@+id/nav_backspace"
-            android:layout_width="64dp"
+            android:layout_width="48dp"
             android:layout_height="44dp"
-            android:gravity="center"
-            android:text="⌫"
-            android:textSize="22sp"
-            android:textColor="#333333"
+            android:padding="10dp"
+            android:src="@drawable/ic_backspace"
             android:background="@drawable/bg_nav_action"
+            android:contentDescription="退格"
             android:layout_marginStart="4dp" />
     </LinearLayout>
 
-    <!-- 间距 -->
     <View
         android:layout_width="match_parent"
         android:layout_height="8dp" />
 
-    <!-- 剪切/复制/粘贴/全选 -->
+    <!-- 剪切 / 复制 / 粘贴 / 全选 -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center">
 
-        <TextView
+        <ImageView
             android:id="@+id/nav_cut"
-            android:layout_width="64dp"
+            android:layout_width="48dp"
             android:layout_height="44dp"
-            android:gravity="center"
-            android:text="✂"
-            android:textSize="20sp"
-            android:textColor="#333333"
+            android:padding="10dp"
+            android:src="@drawable/ic_content_cut"
             android:background="@drawable/bg_nav_action"
+            android:contentDescription="剪切"
             android:layout_marginEnd="4dp" />
 
-        <TextView
+        <ImageView
             android:id="@+id/nav_copy"
-            android:layout_width="64dp"
+            android:layout_width="48dp"
             android:layout_height="44dp"
-            android:gravity="center"
-            android:text="⎘"
-            android:textSize="20sp"
-            android:textColor="#333333"
+            android:padding="10dp"
+            android:src="@drawable/ic_content_copy"
             android:background="@drawable/bg_nav_action"
+            android:contentDescription="复制"
             android:layout_marginStart="4dp"
             android:layout_marginEnd="4dp" />
 
-        <TextView
+        <ImageView
             android:id="@+id/nav_paste"
-            android:layout_width="64dp"
+            android:layout_width="48dp"
             android:layout_height="44dp"
-            android:gravity="center"
-            android:text="📋"
-            android:textSize="20sp"
-            android:textColor="#333333"
+            android:padding="10dp"
+            android:src="@drawable/ic_content_paste"
             android:background="@drawable/bg_nav_action"
+            android:contentDescription="粘贴"
             android:layout_marginStart="4dp"
             android:layout_marginEnd="4dp" />
 
-        <TextView
+        <ImageView
             android:id="@+id/nav_select_all"
-            android:layout_width="64dp"
+            android:layout_width="48dp"
             android:layout_height="44dp"
-            android:gravity="center"
-            android:text="⊞"
-            android:textSize="20sp"
-            android:textColor="#333333"
+            android:padding="10dp"
+            android:src="@drawable/ic_select_all"
             android:background="@drawable/bg_nav_action"
+            android:contentDescription="全选"
             android:layout_marginStart="4dp" />
     </LinearLayout>
 
