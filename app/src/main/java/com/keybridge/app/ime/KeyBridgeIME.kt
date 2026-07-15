@@ -5,6 +5,8 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.keybridge.app.R
 import com.keybridge.app.data.KeyData
 import com.keybridge.app.data.KeyType
@@ -19,9 +21,7 @@ class KeyBridgeIME : InputMethodService() {
     private lateinit var modifierState: ModifierState
     private lateinit var keyEventSender: KeyEventSender
     private var keyboardView: KeyboardView? = null
-    private var tabMain: TextView? = null
-    private var tabSymbols: TextView? = null
-    private var tabBar: LinearLayout? = null
+    private var rootLayout: LinearLayout? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -31,25 +31,45 @@ class KeyBridgeIME : InputMethodService() {
 
     override fun onCreateInputView(): View {
         val rootView = layoutInflater.inflate(R.layout.keyboard_layout, null)
+        rootLayout = rootView.findViewById(R.id.keyboard_root)
 
         keyboardView = rootView.findViewById(R.id.keyboard_view)
-        tabMain = rootView.findViewById(R.id.tab_main)
-        tabSymbols = rootView.findViewById(R.id.tab_symbols)
+        val tabMain = rootView.findViewById<TextView>(R.id.tab_main)
+        val tabSymbols = rootView.findViewById<TextView>(R.id.tab_symbols)
         val tabFunction = rootView.findViewById<TextView>(R.id.tab_function)
-        tabBar = rootView.findViewById(R.id.tab_bar)
 
-        // 设置标签页点击
-        tabMain?.setOnClickListener { switchPage(0) }
-        tabSymbols?.setOnClickListener { switchPage(1) }
-        tabFunction?.setOnClickListener { switchPage(2) }
+        // 现在不需要标签页了，隐藏标签栏
+        rootView.findViewById<LinearLayout>(R.id.tab_bar)?.visibility = View.GONE
 
         // 设置按键点击回调
         keyboardView?.onKeyClick = ::handleKeyAction
 
-        // 默认显示主键盘
-        keyboardView?.setKeyboardLayout(KeyboardLayout.mainPage)
+        // 显示键盘
+        keyboardView?.setKeyboardLayout(KeyboardLayout.keyboardRows)
+
+        // 应用系统安全区域 insets（圆角、导航栏）
+        applySystemInsets(rootView)
 
         return rootView
+    }
+
+    /**
+     * 读取系统圆角和导航栏高度，应用为底部 padding
+     */
+    private fun applySystemInsets(view: View) {
+        ViewCompat.setOnApplyWindowInsetsListener(view) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val displayCutout = insets.getInsets(WindowInsetsCompat.Type.displayCutout())
+
+            val bottomInset = maxOf(systemBars.bottom, displayCutout.bottom)
+            val leftInset = maxOf(systemBars.left, displayCutout.left)
+            val rightInset = maxOf(systemBars.right, displayCutout.right)
+            val topInset = maxOf(systemBars.top, displayCutout.top)
+
+            v.setPadding(leftInset, topInset, rightInset, bottomInset)
+
+            insets
+        }
     }
 
     override fun onStartInputView(info: EditorInfo?, restarting: Boolean) {
@@ -63,22 +83,6 @@ class KeyBridgeIME : InputMethodService() {
     override fun onFinishInputView(finishingInput: Boolean) {
         super.onFinishInputView(finishingInput)
         modifierState.reset()
-    }
-
-    private fun switchPage(pageIndex: Int) {
-        val pages = listOf(KeyboardLayout.mainPage, KeyboardLayout.symbolsPage, KeyboardLayout.functionPage)
-        keyboardView?.setPage(pageIndex)
-        keyboardView?.setKeyboardLayout(pages[pageIndex])
-
-        // 更新标签样式
-        val tabs = listOf(tabMain, tabSymbols, tabBar?.findViewById(R.id.tab_function))
-        tabs.forEachIndexed { index, tab ->
-            tab?.setTextColor(
-                if (index == pageIndex) android.graphics.Color.parseColor("#1565C0")
-                else android.graphics.Color.parseColor("#666666")
-            )
-            tab?.setTypeface(null, if (index == pageIndex) android.graphics.Typeface.BOLD else android.graphics.Typeface.NORMAL)
-        }
     }
 
     /**

@@ -7,51 +7,17 @@
     android:background="#E8E8E8"
     android:padding="2dp">
 
-    <!-- 标签栏 -->
+    <!-- 标签栏（已弃用，隐藏） -->
     <LinearLayout
         android:id="@+id/tab_bar"
         android:layout_width="match_parent"
-        android:layout_height="36dp"
-        android:orientation="horizontal"
-        android:background="#D0D0D0">
+        android:layout_height="0dp"
+        android:visibility="gone"
+        android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/tab_main"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="主键盘"
-            android:textSize="13sp"
-            android:textStyle="bold"
-            android:textColor="#1565C0"
-            android:background="#E8E8E8"
-            android:clickable="true"
-            android:focusable="true" />
-
-        <TextView
-            android:id="@+id/tab_symbols"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="符号"
-            android:textSize="13sp"
-            android:textColor="#666666"
-            android:clickable="true"
-            android:focusable="true" />
-
-        <TextView
-            android:id="@+id/tab_function"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="功能键"
-            android:textSize="13sp"
-            android:textColor="#666666"
-            android:clickable="true"
-            android:focusable="true" />
+        <TextView android:id="@+id/tab_main" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone" />
+        <TextView android:id="@+id/tab_symbols" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone" />
+        <TextView android:id="@+id/tab_function" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone" />
     </LinearLayout>
 
     <!-- 键盘内容区域 -->
