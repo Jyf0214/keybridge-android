@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp"
+    android:gravity="center">
+
+    <!-- 方向键区域：倒 T 形 -->
+    <!-- 上 -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/nav_up"
+            android:layout_width="64dp"
+            android:layout_height="52dp"
+            android:gravity="center"
+            android:text="▲"
+            android:textSize="20sp"
+            android:textColor="#1565C0"
+            android:background="@drawable/bg_nav_key"
+            android:layout_marginEnd="2dp" />
+    </LinearLayout>
+
+    <!-- ← · → -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/nav_left"
+            android:layout_width="64dp"
+            android:layout_height="52dp"
+            android:gravity="center"
+            android:text="◀"
+            android:textSize="20sp"
+            android:textColor="#1565C0"
+            android:background="@drawable/bg_nav_key"
+            android:layout_marginEnd="2dp" />
+
+        <TextView
+            android:layout_width="64dp"
+            android:layout_height="52dp"
+            android:gravity="center"
+            android:text="·"
+            android:textSize="20sp"
+            android:textColor="#999999"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="2dp" />
+
+        <TextView
+            android:id="@+id/nav_right"
+            android:layout_width="64dp"
+            android:layout_height="52dp"
+            android:gravity="center"
+            android:text="▶"
+            android:textSize="20sp"
+            android:textColor="#1565C0"
+            android:background="@drawable/bg_nav_key"
+            android:layout_marginStart="2dp" />
+    </LinearLayout>
+
+    <!-- 下 -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/nav_down"
+            android:layout_width="64dp"
+            android:layout_height="52dp"
+            android:gravity="center"
+            android:text="▼"
+            android:textSize="20sp"
+            android:textColor="#1565C0"
+            android:background="@drawable/bg_nav_key"
+            android:layout_marginTop="2dp" />
+    </LinearLayout>
+
+    <!-- 间距 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="12dp" />
+
+    <!-- 编辑操作按钮 -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/nav_undo"
+            android:layout_width="64dp"
+            android:layout_height="44dp"
+            android:gravity="center"
+            android:text="↶"
+            android:textSize="22sp"
+            android:textColor="#333333"
+            android:background="@drawable/bg_nav_action"
+            android:layout_marginEnd="4dp" />
+
+        <TextView
+            android:id="@+id/nav_redo"
+            android:layout_width="64dp"
+            android:layout_height="44dp"
+            android:gravity="center"
+            android:text="↷"
+            android:textSize="22sp"
+            android:textColor="#333333"
+            android:background="@drawable/bg_nav_action"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp" />
+
+        <TextView
+            android:id="@+id/nav_backspace"
+            android:layout_width="64dp"
+            android:layout_height="44dp"
+            android:gravity="center"
+            android:text="⌫"
+            android:textSize="22sp"
+            android:textColor="#333333"
+            android:background="@drawable/bg_nav_action"
+            android:layout_marginStart="4dp" />
+    </LinearLayout>
+
+    <!-- 间距 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="8dp" />
+
+    <!-- 剪切/复制/粘贴/全选 -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/nav_cut"
+            android:layout_width="64dp"
+            android:layout_height="44dp"
+            android:gravity="center"
+            android:text="✂"
+            android:textSize="20sp"
+            android:textColor="#333333"
+            android:background="@drawable/bg_nav_action"
+            android:layout_marginEnd="4dp" />
+
+        <TextView
+            android:id="@+id/nav_copy"
+            android:layout_width="64dp"
+            android:layout_height="44dp"
+            android:gravity="center"
+            android:text="⎘"
+            android:textSize="20sp"
+            android:textColor="#333333"
+            android:background="@drawable/bg_nav_action"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp" />
+
+        <TextView
+            android:id="@+id/nav_paste"
+            android:layout_width="64dp"
+            android:layout_height="44dp"
+            android:gravity="center"
+            android:text="📋"
+            android:textSize="20sp"
+            android:textColor="#333333"
+            android:background="@drawable/bg_nav_action"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp" />
+
+        <TextView
+            android:id="@+id/nav_select_all"
+            android:layout_width="64dp"
+            android:layout_height="44dp"
+            android:gravity="center"
+            android:text="⊞"
+            android:textSize="20sp"
+            android:textColor="#333333"
+            android:background="@drawable/bg_nav_action"
+            android:layout_marginStart="4dp" />
+    </LinearLayout>
+
+</LinearLayout>

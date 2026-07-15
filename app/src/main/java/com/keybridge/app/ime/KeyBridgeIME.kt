@@ -1,6 +1,8 @@
 package com.keybridge.app.ime
 
+import android.animation.ObjectAnimator
 import android.inputmethodservice.InputMethodService
+import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.LinearLayout
@@ -23,6 +25,19 @@ class KeyBridgeIME : InputMethodService() {
     private var keyboardView: KeyboardView? = null
     private var rootLayout: LinearLayout? = null
 
+    // 工具栏
+    private var toolbar: View? = null
+    private var modShift: TextView? = null
+    private var modCtrl: TextView? = null
+    private var modAlt: TextView? = null
+    private var modMeta: TextView? = null
+    private var btnNavToggle: TextView? = null
+
+    // 页面切换
+    private var isNavPage = false
+    private var navPage: View? = null
+    private var keyboardContainer: View? = null
+
     override fun onCreate() {
         super.onCreate()
         modifierState = ModifierState()
@@ -33,24 +48,131 @@ class KeyBridgeIME : InputMethodService() {
         val rootView = layoutInflater.inflate(R.layout.keyboard_layout, null)
         rootLayout = rootView.findViewById(R.id.keyboard_root)
 
+        // 工具栏
+        toolbar = rootView.findViewById(R.id.toolbar)
+        modShift = rootView.findViewById(R.id.mod_shift)
+        modCtrl = rootView.findViewById(R.id.mod_ctrl)
+        modAlt = rootView.findViewById(R.id.mod_alt)
+        modMeta = rootView.findViewById(R.id.mod_meta)
+        btnNavToggle = rootView.findViewById(R.id.btn_nav_toggle)
+
+        // 普通键盘
         keyboardView = rootView.findViewById(R.id.keyboard_view)
-        val tabMain = rootView.findViewById<TextView>(R.id.tab_main)
-        val tabSymbols = rootView.findViewById<TextView>(R.id.tab_symbols)
-        val tabFunction = rootView.findViewById<TextView>(R.id.tab_function)
-
-        // 现在不需要标签页了，隐藏标签栏
-        rootView.findViewById<LinearLayout>(R.id.tab_bar)?.visibility = View.GONE
-
-        // 设置按键点击回调
         keyboardView?.onKeyClick = ::handleKeyAction
-
-        // 显示键盘
         keyboardView?.setKeyboardLayout(KeyboardLayout.keyboardRows)
 
-        // 应用系统安全区域 insets（圆角、导航栏）
+        // 导航页面
+        navPage = rootView.findViewById(R.id.nav_page)
+        setupNavPage(rootView)
+
+        // 页面切换按钮
+        btnNavToggle?.setOnClickListener { togglePage() }
+
+        // 应用系统安全区域 insets
         applySystemInsets(rootView)
 
         return rootView
+    }
+
+    /**
+     * 设置导航页面按钮点击事件
+     */
+    private fun setupNavPage(rootView: View) {
+        val nav = navPage ?: return
+
+        // 方向键
+        nav.findViewById<View>(R.id.nav_up)?.setOnClickListener {
+            keyEventSender.sendKeyEvent(currentInputConnection, KeyEvent.KEYCODE_DPAD_UP)
+        }
+        nav.findViewById<View>(R.id.nav_down)?.setOnClickListener {
+            keyEventSender.sendKeyEvent(currentInputConnection, KeyEvent.KEYCODE_DPAD_DOWN)
+        }
+        nav.findViewById<View>(R.id.nav_left)?.setOnClickListener {
+            keyEventSender.sendKeyEvent(currentInputConnection, KeyEvent.KEYCODE_DPAD_LEFT)
+        }
+        nav.findViewById<View>(R.id.nav_right)?.setOnClickListener {
+            keyEventSender.sendKeyEvent(currentInputConnection, KeyEvent.KEYCODE_DPAD_RIGHT)
+        }
+
+        // 编辑操作
+        nav.findViewById<View>(R.id.nav_undo)?.setOnClickListener {
+            sendEditorAction(KeyEvent.KEYCODE_Z, ctrl = true)
+        }
+        nav.findViewById<View>(R.id.nav_redo)?.setOnClickListener {
+            sendEditorAction(KeyEvent.KEYCODE_Z, ctrl = true, shift = true)
+        }
+        nav.findViewById<View>(R.id.nav_backspace)?.setOnClickListener {
+            currentInputConnection?.deleteSurroundingText(1, 0)
+        }
+        nav.findViewById<View>(R.id.nav_cut)?.setOnClickListener {
+            sendEditorAction(KeyEvent.KEYCODE_X, ctrl = true)
+        }
+        nav.findViewById<View>(R.id.nav_copy)?.setOnClickListener {
+            sendEditorAction(KeyEvent.KEYCODE_C, ctrl = true)
+        }
+        nav.findViewById<View>(R.id.nav_paste)?.setOnClickListener {
+            sendEditorAction(KeyEvent.KEYCODE_V, ctrl = true)
+        }
+        nav.findViewById<View>(R.id.nav_select_all)?.setOnClickListener {
+            sendEditorAction(KeyEvent.KEYCODE_A, ctrl = true)
+        }
+    }
+
+    /**
+     * 发送 Ctrl/Shift 组合键
+     */
+    private fun sendEditorAction(keyCode: Int, ctrl: Boolean = false, shift: Boolean = false) {
+        var meta = 0
+        if (ctrl) meta = meta or KeyEvent.META_CTRL_ON
+        if (shift) meta = meta or KeyEvent.META_SHIFT_ON
+        keyEventSender.sendKeyEvent(currentInputConnection, keyCode, meta)
+    }
+
+    /**
+     * 切换普通键盘 / 导航页面，带淡入淡出动效
+     */
+    private fun togglePage() {
+        val kb = keyboardView ?: return
+        val nav = navPage ?: return
+        val targetAlpha: Float
+        val duration = 180L
+
+        if (isNavPage) {
+            // 导航 → 普通：导航淡出，键盘淡入
+            targetAlpha = 0f
+            ObjectAnimator.ofFloat(nav, "alpha", 1f, 0f).apply {
+                this.duration = duration
+                start()
+            }
+            kb.postDelayed({
+                nav.visibility = View.GONE
+                kb.visibility = View.VISIBLE
+                kb.alpha = 0f
+                ObjectAnimator.ofFloat(kb, "alpha", 0f, 1f).apply {
+                    this.duration = duration
+                    start()
+                }
+            }, duration)
+            btnNavToggle?.text = "✜"
+        } else {
+            // 普通 → 导航：键盘淡出，导航淡入
+            targetAlpha = 0f
+            ObjectAnimator.ofFloat(kb, "alpha", 1f, 0f).apply {
+                this.duration = duration
+                start()
+            }
+            kb.postDelayed({
+                kb.visibility = View.GONE
+                nav.visibility = View.VISIBLE
+                nav.alpha = 0f
+                ObjectAnimator.ofFloat(nav, "alpha", 0f, 1f).apply {
+                    this.duration = duration
+                    start()
+                }
+            }, duration)
+            btnNavToggle?.text = "⌨"
+        }
+        isNavPage = !isNavPage
     }
 
     /**
@@ -77,12 +199,14 @@ class KeyBridgeIME : InputMethodService() {
         if (!restarting) {
             modifierState.reset()
             keyboardView?.setActiveModifiers(emptySet())
+            updateToolbarStatus()
         }
     }
 
     override fun onFinishInputView(finishingInput: Boolean) {
         super.onFinishInputView(finishingInput)
         modifierState.reset()
+        updateToolbarStatus()
     }
 
     /**
@@ -94,20 +218,21 @@ class KeyBridgeIME : InputMethodService() {
         when (keyData.type) {
             KeyType.MODIFIER -> {
                 when (keyData.keyCode) {
-                    android.view.KeyEvent.KEYCODE_SHIFT_LEFT,
-                    android.view.KeyEvent.KEYCODE_SHIFT_RIGHT ->
+                    KeyEvent.KEYCODE_SHIFT_LEFT,
+                    KeyEvent.KEYCODE_SHIFT_RIGHT ->
                         modifierState.toggleLock(ModifierState.Modifier.SHIFT)
-                    android.view.KeyEvent.KEYCODE_CTRL_LEFT,
-                    android.view.KeyEvent.KEYCODE_CTRL_RIGHT ->
+                    KeyEvent.KEYCODE_CTRL_LEFT,
+                    KeyEvent.KEYCODE_CTRL_RIGHT ->
                         modifierState.toggleLock(ModifierState.Modifier.CTRL)
-                    android.view.KeyEvent.KEYCODE_ALT_LEFT,
-                    android.view.KeyEvent.KEYCODE_ALT_RIGHT ->
+                    KeyEvent.KEYCODE_ALT_LEFT,
+                    KeyEvent.KEYCODE_ALT_RIGHT ->
                         modifierState.toggleLock(ModifierState.Modifier.ALT)
-                    android.view.KeyEvent.KEYCODE_META_LEFT,
-                    android.view.KeyEvent.KEYCODE_META_RIGHT ->
+                    KeyEvent.KEYCODE_META_LEFT,
+                    KeyEvent.KEYCODE_META_RIGHT ->
                         modifierState.toggleLock(ModifierState.Modifier.META)
                 }
                 updateModifierVisual()
+                updateToolbarStatus()
             }
 
             KeyType.CHAR -> {
@@ -115,14 +240,12 @@ class KeyBridgeIME : InputMethodService() {
                 val altActive = modifierState.isActive(ModifierState.Modifier.ALT)
                 val shiftActive = modifierState.isActive(ModifierState.Modifier.SHIFT)
 
-                // 如果有任何修饰键激活，发送组合键事件（如 Ctrl+C、Alt+X）
                 if (ctrlActive || altActive) {
                     keyEventSender.handleModifierCombo(
                         inputConnection, keyData.keyCode,
                         ctrlActive, altActive, shiftActive
                     )
                 } else {
-                    // 正常字符输入
                     if (keyData.commitText != null) {
                         val char = if (shiftActive) keyData.commitText.uppercase()
                                    else keyData.commitText
@@ -142,6 +265,7 @@ class KeyBridgeIME : InputMethodService() {
                 }
                 modifierState.onCharacterInput()
                 updateModifierVisual()
+                updateToolbarStatus()
             }
 
             KeyType.NAVIGATION -> {
@@ -151,9 +275,7 @@ class KeyBridgeIME : InputMethodService() {
 
             KeyType.SPECIAL -> {
                 when (keyData.keyCode) {
-                    android.view.KeyEvent.KEYCODE_ENTER -> {
-                        // Enter 优先用 commitText("\n")，兼容性最好
-                        val metaState = modifierState.getMetaState()
+                    KeyEvent.KEYCODE_ENTER -> {
                         val handled = keyEventSender.handleModifierCombo(
                             inputConnection, keyData.keyCode,
                             modifierState.isActive(ModifierState.Modifier.CTRL),
@@ -164,9 +286,7 @@ class KeyBridgeIME : InputMethodService() {
                             keyEventSender.sendChar(inputConnection, '\n')
                         }
                     }
-                    android.view.KeyEvent.KEYCODE_DEL -> {
-                        // Backspace 用 deleteSurroundingText，最可靠
-                        val metaState = modifierState.getMetaState()
+                    KeyEvent.KEYCODE_DEL -> {
                         val handled = keyEventSender.handleModifierCombo(
                             inputConnection, keyData.keyCode,
                             modifierState.isActive(ModifierState.Modifier.CTRL),
@@ -177,8 +297,7 @@ class KeyBridgeIME : InputMethodService() {
                             inputConnection?.deleteSurroundingText(1, 0)
                         }
                     }
-                    android.view.KeyEvent.KEYCODE_FORWARD_DEL -> {
-                        // Delete（向前删除）
+                    KeyEvent.KEYCODE_FORWARD_DEL -> {
                         val handled = keyEventSender.handleModifierCombo(
                             inputConnection, keyData.keyCode,
                             modifierState.isActive(ModifierState.Modifier.CTRL),
@@ -190,16 +309,15 @@ class KeyBridgeIME : InputMethodService() {
                         }
                     }
                     else -> {
-                        // 其他特殊键（Tab、Esc、CapsLock 等）
                         val metaState = modifierState.getMetaState()
                         keyEventSender.sendKeyEvent(inputConnection, keyData.keyCode, metaState)
                     }
                 }
-                // Enter 和 Backspace 输入后也清理临时修饰键
-                if (keyData.keyCode == android.view.KeyEvent.KEYCODE_ENTER ||
-                    keyData.keyCode == android.view.KeyEvent.KEYCODE_DEL) {
+                if (keyData.keyCode == KeyEvent.KEYCODE_ENTER ||
+                    keyData.keyCode == KeyEvent.KEYCODE_DEL) {
                     modifierState.onCharacterInput()
                     updateModifierVisual()
+                    updateToolbarStatus()
                 }
             }
 
@@ -210,61 +328,89 @@ class KeyBridgeIME : InputMethodService() {
         }
     }
 
+    /**
+     * 更新键盘视图上的修饰键高亮
+     */
     private fun updateModifierVisual() {
         val active = mutableSetOf<Int>()
         if (modifierState.isLocked(ModifierState.Modifier.SHIFT)) {
-            active.add(android.view.KeyEvent.KEYCODE_SHIFT_LEFT)
+            active.add(KeyEvent.KEYCODE_SHIFT_LEFT)
         }
         if (modifierState.isLocked(ModifierState.Modifier.CTRL)) {
-            active.add(android.view.KeyEvent.KEYCODE_CTRL_LEFT)
+            active.add(KeyEvent.KEYCODE_CTRL_LEFT)
         }
         if (modifierState.isLocked(ModifierState.Modifier.ALT)) {
-            active.add(android.view.KeyEvent.KEYCODE_ALT_LEFT)
+            active.add(KeyEvent.KEYCODE_ALT_LEFT)
         }
         if (modifierState.isLocked(ModifierState.Modifier.META)) {
-            active.add(android.view.KeyEvent.KEYCODE_META_LEFT)
+            active.add(KeyEvent.KEYCODE_META_LEFT)
         }
         keyboardView?.setActiveModifiers(active)
     }
 
+    /**
+     * 更新工具栏修饰键状态显示
+     */
+    private fun updateToolbarStatus() {
+        val activeColor = 0xFF1565C0.toInt()
+        val inactiveColor = 0xFF999999.toInt()
+
+        val shiftActive = modifierState.isLocked(ModifierState.Modifier.SHIFT)
+        val ctrlActive = modifierState.isLocked(ModifierState.Modifier.CTRL)
+        val altActive = modifierState.isLocked(ModifierState.Modifier.ALT)
+        val metaActive = modifierState.isLocked(ModifierState.Modifier.META)
+
+        modShift?.visibility = if (shiftActive) View.VISIBLE else View.GONE
+        modShift?.setTextColor(activeColor)
+
+        modCtrl?.visibility = if (ctrlActive) View.VISIBLE else View.GONE
+        modCtrl?.setTextColor(activeColor)
+
+        modAlt?.visibility = if (altActive) View.VISIBLE else View.GONE
+        modAlt?.setTextColor(activeColor)
+
+        modMeta?.visibility = if (metaActive) View.VISIBLE else View.GONE
+        modMeta?.setTextColor(activeColor)
+    }
+
     private fun getKeyLabel(keyCode: Int): String {
         return when (keyCode) {
-            android.view.KeyEvent.KEYCODE_A -> "A"
-            android.view.KeyEvent.KEYCODE_B -> "B"
-            android.view.KeyEvent.KEYCODE_C -> "C"
-            android.view.KeyEvent.KEYCODE_D -> "D"
-            android.view.KeyEvent.KEYCODE_E -> "E"
-            android.view.KeyEvent.KEYCODE_F -> "F"
-            android.view.KeyEvent.KEYCODE_G -> "G"
-            android.view.KeyEvent.KEYCODE_H -> "H"
-            android.view.KeyEvent.KEYCODE_I -> "I"
-            android.view.KeyEvent.KEYCODE_J -> "J"
-            android.view.KeyEvent.KEYCODE_K -> "K"
-            android.view.KeyEvent.KEYCODE_L -> "L"
-            android.view.KeyEvent.KEYCODE_M -> "M"
-            android.view.KeyEvent.KEYCODE_N -> "N"
-            android.view.KeyEvent.KEYCODE_O -> "O"
-            android.view.KeyEvent.KEYCODE_P -> "P"
-            android.view.KeyEvent.KEYCODE_Q -> "Q"
-            android.view.KeyEvent.KEYCODE_R -> "R"
-            android.view.KeyEvent.KEYCODE_S -> "S"
-            android.view.KeyEvent.KEYCODE_T -> "T"
-            android.view.KeyEvent.KEYCODE_U -> "U"
-            android.view.KeyEvent.KEYCODE_V -> "V"
-            android.view.KeyEvent.KEYCODE_W -> "W"
-            android.view.KeyEvent.KEYCODE_X -> "X"
-            android.view.KeyEvent.KEYCODE_Y -> "Y"
-            android.view.KeyEvent.KEYCODE_Z -> "Z"
-            android.view.KeyEvent.KEYCODE_0 -> "0"
-            android.view.KeyEvent.KEYCODE_1 -> "1"
-            android.view.KeyEvent.KEYCODE_2 -> "2"
-            android.view.KeyEvent.KEYCODE_3 -> "3"
-            android.view.KeyEvent.KEYCODE_4 -> "4"
-            android.view.KeyEvent.KEYCODE_5 -> "5"
-            android.view.KeyEvent.KEYCODE_6 -> "6"
-            android.view.KeyEvent.KEYCODE_7 -> "7"
-            android.view.KeyEvent.KEYCODE_8 -> "8"
-            android.view.KeyEvent.KEYCODE_9 -> "9"
+            KeyEvent.KEYCODE_A -> "A"
+            KeyEvent.KEYCODE_B -> "B"
+            KeyEvent.KEYCODE_C -> "C"
+            KeyEvent.KEYCODE_D -> "D"
+            KeyEvent.KEYCODE_E -> "E"
+            KeyEvent.KEYCODE_F -> "F"
+            KeyEvent.KEYCODE_G -> "G"
+            KeyEvent.KEYCODE_H -> "H"
+            KeyEvent.KEYCODE_I -> "I"
+            KeyEvent.KEYCODE_J -> "J"
+            KeyEvent.KEYCODE_K -> "K"
+            KeyEvent.KEYCODE_L -> "L"
+            KeyEvent.KEYCODE_M -> "M"
+            KeyEvent.KEYCODE_N -> "N"
+            KeyEvent.KEYCODE_O -> "O"
+            KeyEvent.KEYCODE_P -> "P"
+            KeyEvent.KEYCODE_Q -> "Q"
+            KeyEvent.KEYCODE_R -> "R"
+            KeyEvent.KEYCODE_S -> "S"
+            KeyEvent.KEYCODE_T -> "T"
+            KeyEvent.KEYCODE_U -> "U"
+            KeyEvent.KEYCODE_V -> "V"
+            KeyEvent.KEYCODE_W -> "W"
+            KeyEvent.KEYCODE_X -> "X"
+            KeyEvent.KEYCODE_Y -> "Y"
+            KeyEvent.KEYCODE_Z -> "Z"
+            KeyEvent.KEYCODE_0 -> "0"
+            KeyEvent.KEYCODE_1 -> "1"
+            KeyEvent.KEYCODE_2 -> "2"
+            KeyEvent.KEYCODE_3 -> "3"
+            KeyEvent.KEYCODE_4 -> "4"
+            KeyEvent.KEYCODE_5 -> "5"
+            KeyEvent.KEYCODE_6 -> "6"
+            KeyEvent.KEYCODE_7 -> "7"
+            KeyEvent.KEYCODE_8 -> "8"
+            KeyEvent.KEYCODE_9 -> "9"
             else -> ""
         }
     }
