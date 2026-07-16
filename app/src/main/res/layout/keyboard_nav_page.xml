@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
@@ -9,11 +10,11 @@
     android:paddingBottom="4dp"
     android:gravity="center_vertical">
 
-    <!-- ========== 左侧：方向键 ========== -->
+    <!-- ========== 左侧：方向键十字区 ========== -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
+        android:layout_weight="3"
         android:orientation="vertical"
         android:gravity="center"
         android:padding="4dp">
@@ -26,16 +27,16 @@
 
             <ImageView
                 android:id="@+id/nav_up"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:padding="4dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:padding="6dp"
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_chevron_up"
                 android:background="@drawable/bg_nav_key"
                 android:contentDescription="上" />
         </LinearLayout>
 
-        <!-- ← · → -->
+        <!-- ← 中间 → -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -45,27 +46,29 @@
 
             <ImageView
                 android:id="@+id/nav_left"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:padding="4dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:padding="6dp"
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_chevron_left"
                 android:background="@drawable/bg_nav_key"
                 android:contentDescription="左" />
 
-            <TextView
-                android:layout_width="24dp"
-                android:layout_height="56dp"
-                android:gravity="center"
-                android:text="·"
-                android:textSize="22sp"
-                android:textColor="#DADCE0" />
+            <ImageView
+                android:id="@+id/nav_enter"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:padding="6dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_enter"
+                android:background="@drawable/bg_nav_key"
+                android:contentDescription="回车" />
 
             <ImageView
                 android:id="@+id/nav_right"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:padding="4dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:padding="6dp"
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_chevron_right"
                 android:background="@drawable/bg_nav_key"
@@ -81,9 +84,9 @@
 
             <ImageView
                 android:id="@+id/nav_down"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:padding="4dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:padding="6dp"
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_chevron_down"
                 android:background="@drawable/bg_nav_key"
@@ -92,47 +95,49 @@
 
     </LinearLayout>
 
-    <!-- ========== 右侧：操作按钮 ========== -->
-    <LinearLayout
+    <!-- ========== 右侧：操作按钮（FlexboxLayout 自适应换行） ========== -->
+    <com.google.android.flexbox.FlexboxLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:paddingStart="2dp">
+        android:layout_weight="2"
+        android:paddingStart="4dp"
+        app:flexWrap="wrap"
+        app:alignItems="center"
+        app:justifyContent="center">
 
         <ImageView
             android:id="@+id/nav_copy"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:padding="7dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:padding="6dp"
             android:scaleType="centerInside"
             android:src="@drawable/ic_content_copy"
             android:background="@drawable/bg_nav_action"
             android:contentDescription="复制"
-            android:layout_marginBottom="2dp" />
+            android:layout_margin="2dp" />
 
         <ImageView
             android:id="@+id/nav_paste"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:padding="7dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:padding="6dp"
             android:scaleType="centerInside"
             android:src="@drawable/ic_content_paste"
             android:background="@drawable/bg_nav_action"
             android:contentDescription="粘贴"
-            android:layout_marginBottom="2dp" />
+            android:layout_margin="2dp" />
 
         <ImageView
             android:id="@+id/nav_switch"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:padding="7dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:padding="6dp"
             android:scaleType="centerInside"
             android:src="@drawable/ic_globe"
             android:background="@drawable/bg_nav_action"
-            android:contentDescription="切换键盘" />
+            android:contentDescription="切换键盘"
+            android:layout_margin="2dp" />
 
-    </LinearLayout>
+    </com.google.android.flexbox.FlexboxLayout>
 
 </LinearLayout>

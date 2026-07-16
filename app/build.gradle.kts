@@ -55,6 +55,9 @@ dependencies {
     // CardView（浮动键盘卡片圆角裁剪）
     implementation("androidx.cardview:cardview:1.0.0")
 
+    // FlexboxLayout（导航页面自适应换行）
+    implementation("com.google.android.flexbox:flexbox:3.0.0")
+
     // Compose UI 基础
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")

@@ -239,6 +239,10 @@ class KeyBridgeIME : InputMethodService() {
             keyEventSender.sendKeyEvent(currentInputConnection, KeyEvent.KEYCODE_DPAD_RIGHT)
         }
 
+        nav.findViewById<View>(R.id.nav_enter)?.setOnClickListener {
+            keyEventSender.sendKeyEvent(currentInputConnection, KeyEvent.KEYCODE_ENTER)
+        }
+
         nav.findViewById<View>(R.id.nav_copy)?.setOnClickListener {
             sendEditorAction(KeyEvent.KEYCODE_C, ctrl = true)
         }
