@@ -239,26 +239,14 @@ class KeyBridgeIME : InputMethodService() {
             keyEventSender.sendKeyEvent(currentInputConnection, KeyEvent.KEYCODE_DPAD_RIGHT)
         }
 
-        nav.findViewById<View>(R.id.nav_undo)?.setOnClickListener {
-            sendEditorAction(KeyEvent.KEYCODE_Z, ctrl = true)
-        }
-        nav.findViewById<View>(R.id.nav_redo)?.setOnClickListener {
-            sendEditorAction(KeyEvent.KEYCODE_Z, ctrl = true, shift = true)
-        }
-        nav.findViewById<View>(R.id.nav_backspace)?.setOnClickListener {
-            currentInputConnection?.deleteSurroundingText(1, 0)
-        }
-        nav.findViewById<View>(R.id.nav_cut)?.setOnClickListener {
-            sendEditorAction(KeyEvent.KEYCODE_X, ctrl = true)
-        }
         nav.findViewById<View>(R.id.nav_copy)?.setOnClickListener {
             sendEditorAction(KeyEvent.KEYCODE_C, ctrl = true)
         }
         nav.findViewById<View>(R.id.nav_paste)?.setOnClickListener {
             sendEditorAction(KeyEvent.KEYCODE_V, ctrl = true)
         }
-        nav.findViewById<View>(R.id.nav_select_all)?.setOnClickListener {
-            sendEditorAction(KeyEvent.KEYCODE_A, ctrl = true)
+        nav.findViewById<View>(R.id.nav_switch)?.setOnClickListener {
+            togglePage()
         }
     }
 
