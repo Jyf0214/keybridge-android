@@ -116,6 +116,17 @@
                 android:src="@drawable/ic_nav_toggle"
                 android:background="@drawable/bg_nav_action"
                 android:contentDescription="切换导航页面" />
+
+            <!-- 收起键盘按钮 -->
+            <ImageView
+                android:id="@+id/btn_collapse"
+                android:layout_width="34dp"
+                android:layout_height="30dp"
+                android:padding="5dp"
+                android:src="@drawable/ic_chevron_down_simple"
+                android:background="@drawable/bg_nav_action"
+                android:contentDescription="收起键盘"
+                android:layout_marginStart="2dp" />
         </LinearLayout>
 
         <!-- 键盘内容区域（普通键盘） -->

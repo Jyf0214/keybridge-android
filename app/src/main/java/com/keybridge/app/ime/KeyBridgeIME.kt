@@ -79,6 +79,11 @@ class KeyBridgeIME : InputMethodService() {
         // 页面切换按钮
         btnNavToggle?.setOnClickListener { togglePage() }
 
+        // 收起键盘按钮
+        rootView.findViewById<View>(R.id.btn_collapse)?.setOnClickListener {
+            window?.window?.decorView?.visibility = View.GONE
+        }
+
         // 设置拖拽
         setupDrag()
 
