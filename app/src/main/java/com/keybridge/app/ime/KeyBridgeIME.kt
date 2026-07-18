@@ -252,6 +252,10 @@ class KeyBridgeIME : InputMethodService() {
         nav.findViewById<View>(R.id.nav_switch)?.setOnClickListener {
             togglePage()
         }
+        nav.findViewById<View>(R.id.nav_ime_picker)?.setOnClickListener {
+            val imm = getSystemService(INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+            imm.showInputMethodPicker()
+        }
     }
 
     private fun sendEditorAction(keyCode: Int, ctrl: Boolean = false, shift: Boolean = false) {

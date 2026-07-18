@@ -137,6 +137,17 @@
             android:contentDescription="切换键盘"
             android:layout_margin="2dp" />
 
+        <ImageView
+            android:id="@+id/nav_ime_picker"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="4dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_loader"
+            android:background="@drawable/bg_nav_action"
+            android:contentDescription="切换输入法"
+            android:layout_margin="2dp" />
+
     </com.google.android.flexbox.FlexboxLayout>
 
 </LinearLayout>
