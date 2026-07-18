@@ -103,12 +103,16 @@ object KeyboardLayout {
             KeyData("/", KeyEvent.KEYCODE_SLASH, KeyType.CHAR, commitText = "/"),
             KeyData("Shift", KeyEvent.KEYCODE_SHIFT_RIGHT, KeyType.MODIFIER, 2.2f)
         ),
-        // Row 5: 底部控制行（方向键已移至工具栏导航页面）
+        // Row 5: 底部控制行
         listOf(
             KeyData("Ctrl", KeyEvent.KEYCODE_CTRL_LEFT, KeyType.MODIFIER, 1.3f),
             KeyData("Alt", KeyEvent.KEYCODE_ALT_LEFT, KeyType.MODIFIER, 1.3f),
             KeyData("Fn", KeyEvent.KEYCODE_MENU, KeyType.FUNCTION, 1.3f),
-            KeyData("Space", KeyEvent.KEYCODE_SPACE, KeyType.CHAR, 5f, commitText = " ")
+            KeyData("Space", KeyEvent.KEYCODE_SPACE, KeyType.CHAR, 3.5f, commitText = " "),
+            KeyData("←", KeyEvent.KEYCODE_DPAD_LEFT, KeyType.NAVIGATION, 0.8f),
+            KeyData("↑", KeyEvent.KEYCODE_DPAD_UP, KeyType.NAVIGATION, 0.8f),
+            KeyData("↓", KeyEvent.KEYCODE_DPAD_DOWN, KeyType.NAVIGATION, 0.8f),
+            KeyData("→", KeyEvent.KEYCODE_DPAD_RIGHT, KeyType.NAVIGATION, 0.8f)
         )
     )
 }
