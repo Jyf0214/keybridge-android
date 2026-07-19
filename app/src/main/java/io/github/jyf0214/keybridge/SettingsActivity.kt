@@ -1,4 +1,4 @@
-package com.keybridge.app
+package io.github.jyf0214.keybridge
 
 import android.content.Context
 import android.content.Intent
@@ -48,7 +48,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.keybridge.app.ui.theme.KeyBridgeTheme
+import io.github.jyf0214.keybridge.ui.theme.KeyBridgeTheme
 
 /**
  * 检测输入法是否已启用
@@ -74,7 +74,7 @@ private fun isKeyBridgeActive(context: Context): Boolean {
 
 /**
  * 获取当前正在使用的输入法组件名
- * 例如: "com.keybridge.app/com.keybridge.app.ime.KeyBridgeIME"
+ * 例如: "io.github.jyf0214.keybridge/io.github.jyf0214.keybridge.ime.KeyBridgeIME"
  */
 private fun getCurrentIme(context: Context): String {
     return Settings.Secure.getString(

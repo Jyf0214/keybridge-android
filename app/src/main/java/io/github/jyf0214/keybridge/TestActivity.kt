@@ -1,4 +1,4 @@
-package com.keybridge.app
+package io.github.jyf0214.keybridge
 
 import android.os.Bundle
 import android.view.KeyEvent
@@ -44,7 +44,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.keybridge.app.ui.theme.KeyBridgeTheme
+import io.github.jyf0214.keybridge.ui.theme.KeyBridgeTheme
 
 /**
  * 按键检测日志条目
@@ -66,7 +66,7 @@ class TestActivity : ComponentActivity() {
     private val imeListener: () -> Unit = { mergeImeEvents() }
 
     private fun mergeImeEvents() {
-        val imeEvents = com.keybridge.app.event.EventLog.snapshot()
+        val imeEvents = io.github.jyf0214.keybridge.event.EventLog.snapshot()
         if (imeEvents.size <= lastImeEventCount) return
         val newEvents = imeEvents.take(imeEvents.size - lastImeEventCount)
         lastImeEventCount = imeEvents.size
@@ -105,7 +105,7 @@ class TestActivity : ComponentActivity() {
                         if (newValue.length > inputText.value.length) {
                             val newChars = newValue.substring(inputText.value.length)
                             // 检查 IME 事件日志中是否已记录这些字符
-                            val imeSnap = com.keybridge.app.event.EventLog.snapshot()
+                            val imeSnap = io.github.jyf0214.keybridge.event.EventLog.snapshot()
                             val imeRecentKeys = imeSnap.take(5).map { it.keyName }
                             newChars.forEach { char ->
                                 val charStr = "'$char'"
@@ -133,14 +133,14 @@ class TestActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        com.keybridge.app.event.EventLog.addListener(imeListener)
+        io.github.jyf0214.keybridge.event.EventLog.addListener(imeListener)
         // 同步已有 IME 事件
-        lastImeEventCount = com.keybridge.app.event.EventLog.snapshot().size
+        lastImeEventCount = io.github.jyf0214.keybridge.event.EventLog.snapshot().size
     }
 
     override fun onPause() {
         super.onPause()
-        com.keybridge.app.event.EventLog.removeListener(imeListener)
+        io.github.jyf0214.keybridge.event.EventLog.removeListener(imeListener)
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {

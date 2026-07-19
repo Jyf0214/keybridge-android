@@ -1,4 +1,4 @@
-package com.keybridge.app.ui.theme
+package io.github.jyf0214.keybridge.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

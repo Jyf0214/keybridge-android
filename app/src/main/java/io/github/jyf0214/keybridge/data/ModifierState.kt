@@ -1,4 +1,4 @@
-package com.keybridge.app.data
+package io.github.jyf0214.keybridge.data
 
 import android.view.KeyEvent
 

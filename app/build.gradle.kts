@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.keybridge.app"
+    namespace = "io.github.jyf0214.keybridge"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.keybridge.app"
+        applicationId = "io.github.jyf0214.keybridge"
         minSdk = 21
         targetSdk = 35
         versionCode = 1

@@ -1,4 +1,4 @@
-package com.keybridge.app.ime
+package io.github.jyf0214.keybridge.ime
 
 import android.view.KeyEvent
 import android.view.inputmethod.InputConnection

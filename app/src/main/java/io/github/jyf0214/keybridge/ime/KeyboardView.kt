@@ -1,4 +1,4 @@
-package com.keybridge.app.ime
+package io.github.jyf0214.keybridge.ime
 
 import android.content.Context
 import android.graphics.Canvas
@@ -10,8 +10,8 @@ import android.util.AttributeSet
 import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.View
-import com.keybridge.app.data.KeyData
-import com.keybridge.app.data.KeyType
+import io.github.jyf0214.keybridge.data.KeyData
+import io.github.jyf0214.keybridge.data.KeyType
 
 /**
  * 自定义键盘 View

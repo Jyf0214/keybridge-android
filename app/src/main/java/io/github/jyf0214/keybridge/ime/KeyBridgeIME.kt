@@ -1,4 +1,4 @@
-package com.keybridge.app.ime
+package io.github.jyf0214.keybridge.ime
 
 import android.animation.ObjectAnimator
 import android.content.res.Configuration
@@ -13,12 +13,12 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.cardview.widget.CardView
-import com.keybridge.app.R
-import com.keybridge.app.data.KeyData
-import com.keybridge.app.data.KeyType
-import com.keybridge.app.data.KeyboardLayout
-import com.keybridge.app.data.ModifierState
-import com.keybridge.app.event.EventLog
+import io.github.jyf0214.keybridge.R
+import io.github.jyf0214.keybridge.data.KeyData
+import io.github.jyf0214.keybridge.data.KeyType
+import io.github.jyf0214.keybridge.data.KeyboardLayout
+import io.github.jyf0214.keybridge.data.ModifierState
+import io.github.jyf0214.keybridge.event.EventLog
 
 /**
  * KeyBridge 输入法核心服务
