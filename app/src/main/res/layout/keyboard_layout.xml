@@ -130,7 +130,7 @@
         </LinearLayout>
 
         <!-- 键盘内容区域（普通键盘） -->
-        <com.keybridge.app.ime.KeyboardView
+        <io.github.jyf0214.keybridge.ime.KeyboardView
             android:id="@+id/keyboard_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
