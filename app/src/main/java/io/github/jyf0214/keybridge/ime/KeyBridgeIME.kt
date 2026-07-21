@@ -81,7 +81,7 @@ class KeyBridgeIME : InputMethodService() {
 
         // 收起键盘按钮
         rootView.findViewById<View>(R.id.btn_collapse)?.setOnClickListener {
-            window?.window?.decorView?.visibility = View.GONE
+            requestHideSelf(0)
         }
 
         // 设置拖拽
